@@ -1,0 +1,26 @@
+<!-- Начало формы. -->
+<?php if (isset($start_end_form)): ?>
+	<?= $this->Form->create(null, ['type' => 'file', 'url' => ['action' => $start_end_form['action']], 'id' => 'myfiles-upload']) ?>
+<?php endif; ?>
+
+<?php
+	// Форма загрузки файла.
+	echo $this->Form->control('myfile[]', [
+			'type' => 'file',
+			'multiple' => true,// Форма multiple.
+			'label' => (isset($label_upload_file)) ? $label_upload_file : '',
+		]);
+
+	// Кнопка "Загрузить".
+	if (isset($label_submit)) {
+		echo $this->Form->control($label_submit, [
+			'type' => 'submit',
+			'id' => 'sub',
+		]);
+	}
+?>
+
+<!-- Конец формы. -->
+<?php if (isset($start_end_form)): ?>
+	<?= $this->Form->end() ?>
+<?php endif; ?>
