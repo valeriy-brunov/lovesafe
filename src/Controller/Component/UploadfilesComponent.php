@@ -5,20 +5,13 @@ namespace Lovesafe\Controller\Component;
 
 use Cake\Controller\Component;
 use Cake\Controller\ComponentRegistry;
-
 use Cake\Filesystem\Folder;
 use Cake\Filesystem\File;
-
 use Cake\Core\Configure;
 use Cake\Core\Configure\Engine\PhpConfig;
-
-use Cake\ORM\TableRegistry;
-
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Network\Exception\NotFoundException;
-
 use Lovesafe\Plugin as LovesafePlugin;
-
-//use Cake\Http\ServerRequest;
 
 /**
  * Uploadfiles component
@@ -322,11 +315,9 @@ class UploadfilesComponent extends Component
 		$data['status'] = $this->_status;
 		// Определяем имя контроллёра, с которого грузится компонент.
 		$controllerName = $this->_request->getParam( 'controller' );
-		if ( mb_strtolower( $controllerName ) == mb_strtolower( $this->_table ) ) {
+		if ( mb_strtolower( $controllerName ) != mb_strtolower( $this->_table ) ) {
 			// Преобразование данных запроса в объекты.
 			$myfile = $this->getController()->Files->newEntity($data, ['validate' => false]);
-			// Производим проверку перед сохранением данных.
-			//$myfile = $this->getController()->Files->patchEntity( $myfile, $data, ['validate' => false] );
 			// Проверяем на наличие ошибок.
 			if ( $myfile->getErrors() ) {
 				// Ошибка проверки сущности (записи).
@@ -341,22 +332,20 @@ class UploadfilesComponent extends Component
 			}
 		}
 		else {
-			$Files = TableRegistry::get( 'Files' );
+			$Files = $this->getController()->getTableLocator()->get('Files');
 			// Создаём новую сущность.
-			$myfile = $Files->newEntity();
-			// Производим проверку перед сохранением данных.
-			$myfile = $Files->patchEntity( $myfile, $data, ['validate' => false] );
+			$entity = $Files->newEntity($data, ['validate' => false]);
 			// Проверяем на наличие ошибок.
-			if ( $myfile->getErrors() ) {
+			if ( $entity->getErrors() ) {
 				// Ошибка проверки сущности (записи).
 				$this->Flash->error( 'Ошибка!' );
 			}
 			else {
-			    if ( !$Files->save( $myfile ) ) {
+			    if ( !$Files->save( $entity ) ) {
 			    	$this->Flash->error('Ошибка при записи в БД!');
 			    }
 			    // Запоминаем id файла.
-			    else $fid[] = $myfile->id;
+			    else $fid[] = $entity->id;
 			}
 		}
 		// Обнуляем размер загруженного изображения для одного цикла.
