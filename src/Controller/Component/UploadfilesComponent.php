@@ -38,6 +38,7 @@ use Lovesafe\Plugin as LovesafePlugin;
  * -------------------------------
  *
  * Перечень обязательных настроек:
+ *	'request' - объект контроллёра Cake\Http\ServerRequest;
  *	'user_id' - id пользователя, которое будет внесено в ТБ 'Files'.
  *
  * Перечень необязательных настроек.
@@ -159,7 +160,7 @@ class UploadfilesComponent extends Component
 	 */
 	public function initialize( array $config ): void
   	{
-		// 
+		// Cake\Http\ServerRequest
 		$this->_request = $config['request'];
 
 		// Загружаем файл конфигурации 'files_default'.
@@ -314,7 +315,7 @@ class UploadfilesComponent extends Component
 		$data['filename'] = preg_replace('/\.\w+$/i', '', $this->_file->getClientFilename());// Удаляем расширение файла.
 		$data['url'] = $this->_url;
 		$data['filemime'] = $this->_file->getClientMediaType();
-		$data['filesize'] = 111;
+		$data['filesize'] = $this->_totalSize;
 		$data['k'] = round( $this->_k, 4 );
 		$data['password_id'] = 2;
 		// Указываем статус файла.
