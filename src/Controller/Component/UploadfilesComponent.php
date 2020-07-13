@@ -41,7 +41,10 @@ use Lovesafe\Plugin as LovesafePlugin;
  *		'name_files_config' - имя дополнительного конфигурационного файла, который перекроет настройки файла конфигурации по умолчанию.
  *
  * Дополнительные публичные методы:
- *		$this->Uploadfiles->fid() Возвращает массив fid загруженных файлов за одну сессию.
+ *		$fids_arr = $this->Uploadfiles->fid(); // Возвращает массив fid загруженных файлов за одну сессию.
+ *		$size_arr_files = $this->Uploadfiles->totalSize(); // Возвращает размер в байтах всех загруженных файлов за одну сессию. Если
+ *																			// загружалось изображение, то для каждого преобразования размер указывается
+ *																			// отдельно.
  */
 class UploadfilesComponent extends Component
 {
@@ -54,12 +57,16 @@ class UploadfilesComponent extends Component
 
   	/**
 	 * Исходные размеры изображения.
+	 *
+	 * @var int
 	 */
   	protected $_height;
 	protected $_width;
-	
+
 	/**
 	 * Новые значения высоты и ширины изображения.
+	 *
+	 * @var int
 	 */
 	protected $_new_height;
 	protected $_new_width;
@@ -68,12 +75,12 @@ class UploadfilesComponent extends Component
 	 * Способ (назание метода) изменения изображения.
 	 */
 	protected $_nameZoom;
-	
+
 	/**
 	 * Качество изображения.
 	 */
 	protected $_image_quality = 100;
-	
+
 	/**
 	 * Глобальная переменная $_FILE.
 	 */
@@ -144,13 +151,21 @@ class UploadfilesComponent extends Component
 	 * будет складываться из размера всех преобразований картинки для одного изображения.
 	 */
 	protected $_totalSize = NULL;
-	
+
 	/**
 	 * Содержит массив fid загруженных файлов.
 	 *
 	 * @var array
 	 */
 	protected $_fid = [];
+	
+	/**
+	 * Содержит массив размеров загруженных файлов. Если загружалось изображение, то для каждого преобразования
+	 * размер указывается отдельно.
+	 *
+	 * @var array
+	 */
+	protected $_totalSizeFiles = [];
 
 	/**
 	 * Выполняем необходимые настройки компонента.
@@ -402,13 +417,23 @@ class UploadfilesComponent extends Component
 		$size = filesize( $this->_full_url );
 		if ( $this->_totalSize ) $this->_totalSize = $this->_totalSize + $size;
 		else $this->_totalSize = $size;
+		$this->_totalSizeFiles[] = $size;
 	}
-	
+
 	/**
 	 * Возвращает массив fid загруженных файлов за одну сессию.
 	 */
 	public function fid()
 	{
 		return $this->_fid;
+	}
+	
+	/**
+	 * Возвращает размер в байтах всех загруженных файлов за одну сессию. Если загружалось изображение, то для каждого преобразования
+	 * размер указывается отдельно.
+	 */
+	public function totalSize()
+	{
+		return $this->_totalSizeFiles;
 	}
 }
