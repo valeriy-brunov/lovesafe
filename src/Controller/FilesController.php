@@ -29,6 +29,7 @@ class FilesController extends AppController
     public function index()
     {
         $this->Uploadfiles->upload();
+        //dump( $this->Uploadfiles->fid() );
     }
 
     /**

@@ -31,15 +31,17 @@ use Lovesafe\Plugin as LovesafePlugin;
  * -------------------------------
  *
  * Перечень обязательных настроек:
- *	'request' - объект контроллёра Cake\Http\ServerRequest;
- *	'user_id' - id пользователя, которое будет внесено в ТБ 'Files'.
+ *		'request' - объект контроллёра Cake\Http\ServerRequest;
+ *		'user_id' - id пользователя, которое будет внесено в ТБ 'Files'.
  *
  * Перечень необязательных настроек.
- *	'album_id' - id альбома из ТБ 'albums'. Такой ТБ может и не быть.
- *	'image_quality' - качество фотографии после её масштабирования. По умолчанию 100%.
- *	'status' - статус файла после его загрузки. По умолчанию 1 - постоянный.
- *	'name_files_config' - имя дополнительного конфигурационного файла, который перекроет настройки файла конфигурации по умолчанию.
+ *		'album_id' - id альбома из ТБ 'albums'. Такой ТБ может и не быть.
+ *		'image_quality' - качество фотографии после её масштабирования. По умолчанию 100%.
+ *		'status' - статус файла после его загрузки. По умолчанию 1 - постоянный.
+ *		'name_files_config' - имя дополнительного конфигурационного файла, который перекроет настройки файла конфигурации по умолчанию.
  *
+ * Дополнительные публичные методы:
+ *		$this->Uploadfiles->fid() Возвращает массив fid загруженных файлов за одну сессию.
  */
 class UploadfilesComponent extends Component
 {
@@ -110,11 +112,6 @@ class UploadfilesComponent extends Component
 	protected $_new_upload_file;
 
 	/**
-	 * Таблица в БД, в которую необходимо сделать запись о загрузке файла.
-	 */
-	protected $_table = 'Files';
-
-	/**
 	 * Коэффициент пропорциональности, который будет указан в таблице Files. Рассчитывается, как отношение ширины
 	 * к высоте фотографии.
 	 */
@@ -147,6 +144,13 @@ class UploadfilesComponent extends Component
 	 * будет складываться из размера всех преобразований картинки для одного изображения.
 	 */
 	protected $_totalSize = NULL;
+	
+	/**
+	 * Содержит массив fid загруженных файлов.
+	 *
+	 * @var array
+	 */
+	protected $_fid = [];
 
 	/**
 	 * Выполняем необходимые настройки компонента.
@@ -157,6 +161,7 @@ class UploadfilesComponent extends Component
 		$this->_request = $config['request'];
 
 		// Загружаем файл конфигурации 'files_default'.
+		// use Lovesafe\Plugin as LovesafePlugin;
 		$plugin = new LovesafePlugin();
 		Configure::config( 'default', new PhpConfig( $plugin->getPath() . 'config/' ) );
 		Configure::load( 'upload_files_default' );
@@ -187,7 +192,7 @@ class UploadfilesComponent extends Component
 	 */
 	public function upload()
 	{
-		// Файл должен быть загружен методом Post.
+		// Файл может быть загружен только методом Post.
 		if ( $this->_request->is('post') ) {
 			// Принимаем данные.
 			$files = $this->_request->getData( 'myfile' );
@@ -205,7 +210,7 @@ class UploadfilesComponent extends Component
 	}
 
 	/**
-	 * Определяет тип файла (изображение, видео) и, взависимости, от типа файла выполняет ряд действий.
+	 * Определяет тип файла (изображение, видео) и, взависимости от типа файла, выполняет ряд действий.
 	 */
 	protected function _requestFile()
 	{
@@ -279,7 +284,7 @@ class UploadfilesComponent extends Component
 	}
 
 	/**
-	 * Записывает изображение в указанную директорию.
+	 * Создаёт директорию и записывает изображение в созданную директорию.
 	 */
 	protected function _saveScrFile()
 	{
@@ -294,7 +299,7 @@ class UploadfilesComponent extends Component
 				imagedestroy( $this->_new_upload_file );
 			}
 			else {
-				// Ошибка при создании директории.
+				$this->getController()->Flash->error( __('Ошибка при создании директории!') );
 			}
 		}
 	}
@@ -304,6 +309,7 @@ class UploadfilesComponent extends Component
 	 */
 	protected function _saveFileBD()
 	{
+		// Данные, которые необходимо записать в ТБ БД.
 		if ( $this->_album ) $data['album_id'] = $this->_album;
 		$data['filename'] = preg_replace('/\.\w+$/i', '', $this->_file->getClientFilename());// Удаляем расширение файла.
 		$data['url'] = $this->_url;
@@ -311,43 +317,18 @@ class UploadfilesComponent extends Component
 		$data['filesize'] = $this->_totalSize;
 		$data['k'] = round( $this->_k, 4 );
 		$data['password_id'] = 2;
-		// Указываем статус файла.
 		$data['status'] = $this->_status;
-		// Определяем имя контроллёра, с которого грузится компонент.
-		$controllerName = $this->_request->getParam( 'controller' );
-		if ( mb_strtolower( $controllerName ) != mb_strtolower( $this->_table ) ) {
-			// Преобразование данных запроса в объекты.
-			$myfile = $this->getController()->Files->newEntity($data, ['validate' => false]);
-			// Проверяем на наличие ошибок.
-			if ( $myfile->getErrors() ) {
-				// Ошибка проверки сущности (записи).
-				$this->Flash->error( 'Ошибка!' );
-			}
-			else {
-			  if ( !$this->getController()->Files->save( $myfile ) ) {
-			    $this->Flash->error( 'Ошибка при записи в БД!' );
-			  }
-			  // Запоминаем id файла.
-			  else $fid[] = $myfile->id;
-			}
-		}
-		else {
-			$Files = $this->getController()->getTableLocator()->get('Files');
-			// Создаём новую сущность.
-			$entity = $Files->newEntity($data, ['validate' => false]);
-			// Проверяем на наличие ошибок.
-			if ( $entity->getErrors() ) {
-				// Ошибка проверки сущности (записи).
-				$this->Flash->error( 'Ошибка!' );
-			}
-			else {
-			    if ( !$Files->save( $entity ) ) {
-			    	$this->Flash->error('Ошибка при записи в БД!');
-			    }
-			    // Запоминаем id файла.
-			    else $fid[] = $entity->id;
-			}
-		}
+
+		// Записываем данные в ТБ БД.
+		$myfile = $this->getController()->Files->newEmptyEntity();
+		$myfile = $this->getController()->Files->patchEntity( $myfile, $data, ['validate' => false] );
+		// Проверяем на наличие ошибок.
+		if ( $this->getController()->Files->save( $myfile ) ) {
+         $this->getController()->Flash->success( __('Файл успешно записан в БД!') );
+         // Запоминаем id загруженного файла.
+			$this->_fid[] = $myfile->id;
+      }
+      else $this->getController()->Flash->error(__('Ошибка!') );
 		// Обнуляем размер загруженного изображения для одного цикла.
 		$this->_totalSize = NULL;
 	}
@@ -421,5 +402,13 @@ class UploadfilesComponent extends Component
 		$size = filesize( $this->_full_url );
 		if ( $this->_totalSize ) $this->_totalSize = $this->_totalSize + $size;
 		else $this->_totalSize = $size;
+	}
+	
+	/**
+	 * Возвращает массив fid загруженных файлов за одну сессию.
+	 */
+	public function fid()
+	{
+		return $this->_fid;
 	}
 }
