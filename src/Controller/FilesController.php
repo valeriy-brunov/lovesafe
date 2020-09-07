@@ -4,6 +4,11 @@ declare(strict_types=1);
 namespace Lovesafe\Controller;
 
 use Lovesafe\Controller\AppController;
+use Laminas\Diactoros\Stream;
+use Cake\Core\Configure;
+use Cake\Core\Configure\Engine\PhpConfig;
+use Lovesafe\Plugin as LovesafePlugin;
+use Cake\Network\Exception\NotFoundException;
 
 /**
  * Files Controller
@@ -13,12 +18,13 @@ use Lovesafe\Controller\AppController;
  */
 class FilesController extends AppController
 {
-	public function initialize(): void
+	/** 
+     * Initialize.
+     */
+    public function initialize(): void
     {
         parent::initialize();
-        $this->loadComponent( 'Lovesafe.Uploadfiles', [
-            'request' => $this->request,
-        ]);
+        $this->loadComponent( 'Lovesafe.Uploadfiles' );
     }
 
     /**
@@ -28,8 +34,47 @@ class FilesController extends AppController
      */
     public function index()
     {
+        //$this->Uploadfiles->upload();
+        //$this->Uploadfiles->saveLastPhotos();
+        
         $this->Uploadfiles->upload();
-        dump( $this->Uploadfiles->totalSize() );
+        $this->set( 'urls_images', $this->Uploadfiles->urlsImages( 'small' ) );
+    }
+
+    /**
+     * 
+     */
+    public function ajaxuploadfiles()
+    {
+        $this->Uploadfiles->upload();
+        $this->set( 'urls_images', $this->Uploadfiles->urlsImages( 'small' ) );
+    }
+
+    /**
+     * Возвращает картинку в виде потока. Путь, переданный данному действию,
+     * представляет следующую запись: ../imgs/big-o2-66-hdd6bh.jpeg
+     */
+    public function img( $path = null )
+    {
+        if ( !$path ) return;
+
+        // Загружаем файл конфигурации 'files_default'.
+        // use Lovesafe\Plugin as LovesafePlugin;
+        $plugin = new LovesafePlugin();
+        Configure::config( 'default', new PhpConfig( $plugin->getPath() . 'config/' ) );
+        Configure::load( 'upload_files_default' );
+        $scrUrl = Configure::read( 'load.scrUrl' );
+
+        $url = explode( '-', $path);
+        $url_end = $url[0] . DS . $url[1] . DS . $url[2] . DS . $url[3];
+
+        $stream = new Stream( $scrUrl . $url_end, 'rb' );
+        // Отключить кеширование.
+        $this->response = $this->response->withDisabledCache();
+        // Заголовок.
+        $this->response = $this->response->withHeader('Content-type', 'image/jpeg');
+        $this->response = $this->response->withBody( $stream );
+        return $this->response;
     }
 
     /**

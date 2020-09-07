@@ -12,6 +12,7 @@ use Cake\Core\Configure\Engine\PhpConfig;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Network\Exception\NotFoundException;
 use Lovesafe\Plugin as LovesafePlugin;
+use Laminas\Diactoros\Stream;
 
 /**
  * Uploadfiles component
@@ -43,16 +44,16 @@ use Lovesafe\Plugin as LovesafePlugin;
  * Дополнительные публичные методы:
  *		$fids_arr = $this->Uploadfiles->fid(); // Возвращает массив fid загруженных файлов за одну сессию.
  *		$size_arr_files = $this->Uploadfiles->totalSize(); // Возвращает размер в байтах всех загруженных файлов за одну сессию. Если
- *																			// загружалось изображение, то для каждого преобразования размер указывается
- *																			// отдельно.
+ *														   // загружалось изображение, то для каждого преобразования размер указывается
+ *														   // отдельно.
  */
 class UploadfilesComponent extends Component
 {
-    /**
-     * Default configuration.
-     *
-     * @var array
-     */
+   /**
+    * Default configuration.
+    *
+    * @var array
+    */
   	protected $_defaultConfig = [];
 
   	/**
@@ -166,6 +167,13 @@ class UploadfilesComponent extends Component
 	 * @var array
 	 */
 	protected $_totalSizeFiles = [];
+	
+	/**
+	 * Содержит массив адресов до загруженных файлов в одной сессии.
+	 * 
+	 * @var array
+	 */
+	protected $_urls = [];
 
 	/**
 	 * Выполняем необходимые настройки компонента.
@@ -173,7 +181,9 @@ class UploadfilesComponent extends Component
 	public function initialize( array $config ): void
   	{
 		// Cake\Http\ServerRequest
-		$this->_request = $config['request'];
+		//$this->_request = $config['request'];
+		$this->_request = $this->getController()->getRequest();
+		$this->_urls = [];
 
 		// Загружаем файл конфигурации 'files_default'.
 		// use Lovesafe\Plugin as LovesafePlugin;
@@ -208,7 +218,7 @@ class UploadfilesComponent extends Component
 	public function upload()
 	{
 		// Файл может быть загружен только методом Post.
-		if ( $this->_request->is('post') ) {
+		if ( $this->_request->is( 'post' ) ) {
 			// Принимаем данные.
 			$files = $this->_request->getData( 'myfile' );
 			// Так как у нас форма multiple, загружаем каждый файл по отдельности.
@@ -290,6 +300,7 @@ class UploadfilesComponent extends Component
 			$url = [substr( $this->_url, 0, 2 ), substr( $this->_url, 2, 2 ), substr( $this->_url, 4 )];
 			$this->_url_not_ext = $this->_scrUrl . $this->_subDir . DS . $url[0] . DS . $url[1];
 			$this->_full_url = $this->_url_not_ext . DS . $url[2] . '.' . $this->_ext();
+			$this->_urls[] = $url[0] . '-' . $url[1] . '-' . $url[2] . '.' . $this->_ext();
 			// Масштабируем изображение.
 			$nameZoom = '_zoomScr' . $this->_nameZoom;
 			$this->$nameZoom();
@@ -306,7 +317,7 @@ class UploadfilesComponent extends Component
 		// Создаём вложенные папки.
 		$folder = new Folder();
 		if ( $folder->create( $this->_url_not_ext ) ) {
-		  // Записываем новый файл в директорию.
+		  	// Записываем новый файл в директорию.
 			if ( imagejpeg( $this->_new_upload_file, $this->_full_url, $this->_image_quality ) ) {
 				// Сохраняем размер загруженного изображения в свойство.
 				$this->_totalsize();
@@ -339,11 +350,11 @@ class UploadfilesComponent extends Component
 		$myfile = $this->getController()->Files->patchEntity( $myfile, $data, ['validate' => false] );
 		// Проверяем на наличие ошибок.
 		if ( $this->getController()->Files->save( $myfile ) ) {
-         $this->getController()->Flash->success( __('Файл успешно записан в БД!') );
-         // Запоминаем id загруженного файла.
+         	$this->getController()->Flash->success( __('Файл успешно записан в БД!') );
+         	// Запоминаем id загруженного файла.
 			$this->_fid[] = $myfile->id;
-      }
-      else $this->getController()->Flash->error(__('Ошибка!') );
+      	}
+      	else $this->getController()->Flash->error( __('Ошибка!') );
 		// Обнуляем размер загруженного изображения для одного цикла.
 		$this->_totalSize = NULL;
 	}
@@ -427,7 +438,7 @@ class UploadfilesComponent extends Component
 	{
 		return $this->_fid;
 	}
-	
+
 	/**
 	 * Возвращает размер в байтах всех загруженных файлов за одну сессию. Если загружалось изображение, то для каждого преобразования
 	 * размер указывается отдельно.
@@ -436,4 +447,35 @@ class UploadfilesComponent extends Component
 	{
 		return $this->_totalSizeFiles;
 	}
+
+	/**
+	 * Сохранение в сессию путей последних загруженных фотографий.
+	 */
+	public function saveLastPhotos()
+	{
+		if ( $this->_request->is( 'post' ) ) {
+			$session = $this->getController()->getRequest()->getSession();
+			if ( $session->check( 'Lastphotos.upload' ) ) {
+				$session->delete( 'Lastphotos.upload' );
+			}
+			$session->write(['Lastphotos.upload' => array_unique($this->_urls)]);
+		}
+	}
+
+	/**
+	 * Возвращает пути к только что загруженным картинкам.
+	 *
+	 * @param {string} $format Формат картинки, например, "big" или "small".
+	 * @return {array} Путь до картинки.
+	 */
+	public function urlsImages( $format )
+	{
+		if ( !$this->_urls ) return null;
+
+		foreach (array_unique($this->_urls) as $key => $value) {
+			$new_array[] = '/img/' . $format . '-' . $value;
+		}
+		return $new_array;
+	}
+
 }

@@ -1,6 +1,12 @@
 <!-- Начало формы. -->
 <?php if (isset($start_end_form)): ?>
-	<?= $this->Form->create(null, ['type' => 'file', 'url' => ['action' => $start_end_form['action']], 'id' => 'myfiles-upload']) ?>
+	<?= $this->Form->create(null, [
+		'type' => 'file',
+		'url' => [
+			'action' => $start_end_form['action']],
+			'id' => 'myfiles-upload',
+			'class' => (isset($class)) ? $class : 'myfiles-upload',
+		])?>
 <?php endif; ?>
 
 <?php
@@ -15,12 +21,12 @@
 	if (isset($label_submit)) {
 		echo $this->Form->control($label_submit, [
 			'type' => 'submit',
-			'id' => 'sub',
+			'id' => 'submit',
 		]);
 	}
 ?>
 
-<!-- Конец формы. -->
 <?php if (isset($start_end_form)): ?>
 	<?= $this->Form->end() ?>
+	<!-- Конец формы. -->
 <?php endif; ?>

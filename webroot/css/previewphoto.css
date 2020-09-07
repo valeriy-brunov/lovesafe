@@ -1,0 +1,19 @@
+.previewphoto {
+	flex-wrap: wrap;
+	margin-bottom: -8px !important;
+}
+
+.previewphoto__panel {
+	padding: 0;
+	margin-bottom: 8px;
+}
+
+.previewphoto__photo {
+	height: 100%;
+	width: 100%;
+	padding: 0;
+	background-color: #666;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+}

@@ -1,0 +1,101 @@
+.panel {
+  display: flex;
+  flex-direction: row;
+  --mr: 8px;
+  margin-right: calc(var(--mr) * (-1));
+}
+
+.panel .panel__col-1,
+.panel .panel__col-2,
+.panel .panel__col-3,
+.panel .panel__col-4,
+.panel .panel__col-5,
+.panel .panel__col-6 { margin-right: var(--mr); }
+
+.panel__col-1,
+.panel__col-2,
+.panel__col-3,
+.panel__col-4,
+.panel__col-5,
+.panel__col-6,
+.panel__col-7,
+.panel__col-8 { padding: 6px; }
+
+.panel__col-1 { width: calc(100% / 8 - var(--mr)); }
+
+.panel__col-2 { width: calc((100% / 8) * 2 - var(--mr)); }
+
+.panel__col-3 { width: calc((100% / 8) * 3 - var(--mr)); }
+
+.panel__col-4 { width: calc((100% / 8) * 4 - var(--mr)); }
+
+.panel__col-5 { width: calc((100% / 8) * 5 - var(--mr)); }
+
+.panel__col-6 { width: calc((100% / 8) * 6 - var(--mr)); }
+
+.panel__col-7 { width: calc((100% / 8) * 7 - var(--mr)); }
+
+.panel__col-8 { width: calc(100% - var(--mr)); }
+
+.panel__col-1,
+.panel__col-2,
+.panel__col-3,
+.panel__col-4,
+.panel__col-5,
+.panel__col-6,
+.panel__col-7,
+.panel__col-8 {
+  background-color: white;
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
+
+.panel__col-1_display_square:before,
+.panel__col-2_display_square:before,
+.panel__col-3_display_square:before,
+.panel__col-4_display_square:before {
+  content: "";
+  padding-top: 100%;
+  float: left;
+}
+
+.panel__col-1_display_circle:before,
+.panel__col-2_display_circle:before,
+.panel__col-3_display_circle:before,
+.panel__col-4_display_circle:before {
+  content: "";
+  padding-top: 100%;
+  float: left;
+}
+
+.panel__col-1_display_circle,
+.panel__col-2_display_circle,
+.panel__col-3_display_circle,
+.panel__col-4_display_circle { border-radius: 50%; }
+
+.panel__col-1_direction_center,
+.panel__col-2_direction_center,
+.panel__col-3_direction_center,
+.panel__col-4_direction_center,
+.panel__col-5_direction_center,
+.panel__col-6_direction_center,
+.panel__col-7_direction_center,
+.panel__col-8_direction_center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.panel__col-1_display_hide,
+.panel__col-2_display_hide,
+.panel__col-3_display_hide,
+.panel__col-4_display_hide,
+.panel__col-5_display_hide,
+.panel__col-6_display_hide,
+.panel__col-7_display_hide,
+.panel__col-8_display_hide {
+  background-color: inherit;
+  box-shadow: none;
+}
+
+.panel__col-8_theme_bookmark { padding: 0; }

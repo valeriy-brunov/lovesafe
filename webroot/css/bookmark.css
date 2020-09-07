@@ -1,0 +1,38 @@
+.bookmark {}
+
+.bookmark .bookmark__li { border-right: 1px solid rgba(0,0,0,0.2); }
+
+.bookmark .bookmark__li:last-child { border-right: 0; }
+
+.bookmark__li { width: calc(100% / 5); }
+
+.bookmark__href {
+	height: 3em;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	text-align: center;
+}
+
+.bookmark__href:link,
+.bookmark__href:visited,
+.bookmark__href:active {
+  text-decoration: none;
+  color: #367633;
+}
+
+.bookmark__href:hover {
+  /*background-color: #77FF73;*/
+  color: #363636;
+  text-decoration: underline;
+}
+
+.bookmark__href_current:link,
+.bookmark__href_current:visited,
+.bookmark__href_current:active,
+.bookmark__href_current:hover {
+	pointer-events: none;
+  cursor: default;
+  color: #363636;
+  text-decoration: underline;
+}

@@ -1,0 +1,21 @@
+.menu-top {}
+
+.menu-top__link:after {
+  content: "\00a0 \00a0 \00a0 ";
+}
+
+.menu-top__li:last-child .menu-top__link:after {
+  content: "";
+}
+
+.menu-top_theme_standart .menu-top__link:link,
+.menu-top_theme_standart .menu-top__link:visited,
+.menu-top_theme_standart .menu-top__link:active {
+  color: inherit;
+  text-decoration: none;
+}
+
+.menu-top_theme_standart .menu-top__link:hover {
+  color: black;
+  text-decoration: none;
+}

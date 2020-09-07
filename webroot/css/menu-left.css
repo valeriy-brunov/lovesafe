@@ -1,0 +1,35 @@
+.menu-left {}
+
+.menu-left__li {
+  padding-left: 0;
+  padding-right: 0;
+  color: inherit;
+}
+
+.menu-left_theme_standart .menu-left__li:link,
+.menu-left_theme_standart .menu-left__li:visited,
+.menu-left_theme_standart .menu-left__li:active {
+  text-decoration: none;
+}
+
+.menu-left_theme_standart .menu-left__li:hover {
+  background-color: #DAD3D3;
+}
+
+.menu-left__link {
+  display: block;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.menu-left_theme_standart .menu-left__link:link,
+.menu-left_theme_standart .menu-left__link:visited,
+.menu-left_theme_standart .menu-left__link:active {
+  color: #171717;
+}
+
+.menu-left_theme_standart .menu-left__link:hover {
+  color: #171717;
+}
