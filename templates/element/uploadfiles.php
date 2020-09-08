@@ -15,6 +15,7 @@
 			'type' => 'file',
 			'multiple' => true,// Форма multiple.
 			'label' => (isset($label_upload_file)) ? $label_upload_file : '',
+			'class' => 'uploadfiles__input',
 		]);
 
 	// Кнопка "Загрузить".

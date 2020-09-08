@@ -41,9 +41,9 @@
 
 	<div class="uploadfiles-panel-right">
 
-	  	<div class="uploadfiles-panel-right__text fonts fonts_size_large">
-	  		<i class="icons icons_arm icons_size_big"></i>&nbsp;&nbsp;или перетащите фотографии сюда
-	  	</div>
+	  <div class="uploadfiles-panel-right__text fonts fonts_size_large">
+	  	<i class="icons icons_arm icons_size_big"></i>&nbsp;&nbsp;или перетащите фотографии сюда
+	  </div>
 
 		<?php
 			echo $this->element('Lovesafe.uploadfiles', [
@@ -69,21 +69,18 @@
   </div>
 <?php $this->end() ?>
 
-<?php echo $this->element('Lovesafe.panel', [
-	'panel' => [
-		'panelleft' => [2, '_display_square _direction_center'],
-		'panelright' => [6, '_direction_center'],
-	]
-]) ?>
-
 <!-- Индикатор загрузки фотографий. -->
 <?php $this->start('panelindicator') ?>
 вакуупупу
 <?php $this->end() ?>
 
 <?php echo $this->element('Lovesafe.panel', [
+	'panel_class' => 'uploadfiles uploadfiles_display_formupload i-bem',
+	'data_bem' => '{ "uploadfiles":{} }',
 	'panel' => [
-		'panelindicator' => [8],
+		'panelleft' => [2, '_display_square _direction_center'],
+		'panelright' => [6, '_direction_center'],
+		'panelindicator' => [8, 'uploadfiles__indicator'],
 	]
 ]) ?>
 
