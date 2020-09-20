@@ -17,3 +17,10 @@
 	background-size: cover;
 	background-repeat: no-repeat;
 }
+
+.not-photos {
+	display: flex;
+	flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

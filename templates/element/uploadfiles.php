@@ -1,5 +1,5 @@
 <!-- Начало формы. -->
-<?php if (isset($start_end_form)): ?>
+<?php if ( $start_end_form ): ?>
 	<?= $this->Form->create(null, [
 		'type' => 'file',
 		'url' => [
@@ -23,11 +23,12 @@
 		echo $this->Form->control($label_submit, [
 			'type' => 'submit',
 			'id' => 'submit',
+			'class' => 'uploadfiles__submit',
 		]);
 	}
 ?>
 
-<?php if (isset($start_end_form)): ?>
+<?php if ( $start_end_form ): ?>
 	<?= $this->Form->end() ?>
 	<!-- Конец формы. -->
 <?php endif; ?>

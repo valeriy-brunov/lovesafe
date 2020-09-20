@@ -39,7 +39,7 @@ return [
      */
     'ext' => [
 	    // Изображения.
-	  'jpeg' => [
+	    'jpeg' => [
 			'image/jpeg',
 			'image/jpg',
 			'image/pjpeg',

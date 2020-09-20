@@ -5,10 +5,13 @@ namespace Lovesafe\Controller;
 
 use Lovesafe\Controller\AppController;
 use Laminas\Diactoros\Stream;
+
 use Cake\Core\Configure;
 use Cake\Core\Configure\Engine\PhpConfig;
 use Lovesafe\Plugin as LovesafePlugin;
+
 use Cake\Network\Exception\NotFoundException;
+//use Cake\Http\CallbackStream;
 
 /**
  * Files Controller
@@ -25,6 +28,7 @@ class FilesController extends AppController
     {
         parent::initialize();
         $this->loadComponent( 'Lovesafe.Uploadfiles' );
+        $this->loadComponent( 'FormProtection' );
     }
 
     /**
@@ -34,25 +38,57 @@ class FilesController extends AppController
      */
     public function index()
     {
-        //$this->Uploadfiles->upload();
-        //$this->Uploadfiles->saveLastPhotos();
-        
-        $this->Uploadfiles->upload();
-        $this->set( 'urls_images', $this->Uploadfiles->urlsImages( 'small' ) );
-    }
+        //echo('1111111111111111111111111');
+        // Если запрашивают страницу через AJAX меняем основной шаблон.
+        if ( $this->request->is('ajax') ) {
 
-    /**
-     * 
-     */
-    public function ajaxuploadfiles()
-    {
-        $this->Uploadfiles->upload();
-        $this->set( 'urls_images', $this->Uploadfiles->urlsImages( 'small' ) );
+            $this->Uploadfiles->upload();
+            $this->set( 'urls_images', $this->Uploadfiles->urlsImages( 'small' ) );
+
+            // // Кодировка ответа.
+            // $this->response = $this->response->withCharset('UTF-8');
+            // // Отключить кеширование.
+            // $this->response = $this->response->withDisabledCache();
+            // // Заголовок.
+            // $this->response = $this->response->withType('application/json');
+            // // cors
+            //$this->response = $this->response->cors( $this->request )
+                 //->allowHeaders(['X-CSRF-Token'])
+                 //->build();
+            // // Создаём новый поток. (use Cake\Http\CallbackStream)
+            // $stream = new CallbackStream( function() {
+            //     echo json_encode(['out' => ['id' => 'ssssss']]);
+            // });
+            // $this->response = $this->response->withBody($stream);
+            // return $this->response;
+
+            // Основной шаблон.
+            $this->viewBuilder()->setLayout( 'ajax' );
+            // Вид.
+            $this->render('ajax_imgs');
+        }
+        else {
+            // Выводим все фотографии владельца фотографий.
+            $array = $this->Files
+                ->find()
+                ->where([
+                    'password_id' => 2,
+                    'status' => 1,
+                ])
+                ->order(['created' => 'DESC'])
+                ->toArray();
+
+            foreach ($array as $obj) {
+                $urls_images[] = $obj->small_url;
+            }
+
+            $this->set('urls_images', $urls_images);
+        }
     }
 
     /**
      * Возвращает картинку в виде потока. Путь, переданный данному действию,
-     * представляет следующую запись: ../imgs/big-o2-66-hdd6bh.jpeg
+     * представляет следующую запись: ../img/big-o2-66-hdd6bh.jpeg
      */
     public function img( $path = null )
     {

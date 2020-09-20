@@ -36,55 +36,69 @@
 	],
 ]) ?>
 
-<!-- Панель для загрузки файлов. -->
-<?php $this->start('panelright') ?>
+<!-- Панель для загрузки файлов2. -->
+<?php $this->start('uploadfiles') ?>
 
-	<div class="uploadfiles-panel-right">
-
-	  <div class="uploadfiles-panel-right__text fonts fonts_size_large">
-	  	<i class="icons icons_arm icons_size_big"></i>&nbsp;&nbsp;или перетащите фотографии сюда
-	  </div>
-
-		<?php
-			echo $this->element('Lovesafe.uploadfiles', [
-			    'start_end_form' => [
-			        'action' => '',
-			    ],
-			    'label_upload_file' => 'Выбрать файл',
-			    'label_submit' => 'Загрузить',
-			    'class' => 'uploadfiles-panel-right__form',
-			]);
-		?>
-
-	</div>
+		Загрузите фотографии&nbsp;
+	  	<?php echo $this->Html->link('с компьютера&nbsp;<i class="icons icons_desktop2 icons_size_big"></i>', '#', [
+			'class' => 'button uploadfiles__button-change-files',
+			'escapeTitle' => false,
+	  	]) ?>
+	  	&nbsp;
+	  	<?php echo $this->Html->link('из ВКонтакте&nbsp;<i class="icons icons_vk icons_size_big"></i>', '#', [
+			'class' => 'button uploadfiles-panel-left__button-upload',
+			'escapeTitle' => false,
+	  	]) ?>
+	  	&nbsp;
+	  	<?php echo $this->Html->link('Другие способы загрузки&nbsp;<i class="icons icons_caret-down icons_size_small"></i>', '#', [
+			'class' => 'button button_theme_white uploadfiles-panel-left__button-upload',
+			'escapeTitle' => false,
+	  	]) ?>
 
 <?php $this->end() ?>
 
-<?php $this->start('panelleft') ?>
-  <div class="uploadfiles-panel-left">
-  	<div class="uploadfiles-panel-left__icon"><i class="icons icons_desktop2 icons_size_large"></i></div>
-  	<div class="uploadfiles-panel-left__text">загрузить</div>
-  	<div class="uploadfiles-panel-left__text">фотографии</div>
-  	<div class="uploadfiles-panel-left__button"><?php echo $this->Form->button('с компьютера', ['type' => 'button']) ?></div>
-  </div>
+<!-- Количество фотографий. -->
+<?php $this->start('countphoto') ?>
+  <span class="fonts fonts_bold">Мои фотографии (0)</span>
 <?php $this->end() ?>
 
-<!-- Индикатор загрузки фотографий. -->
-<?php $this->start('panelindicator') ?>
-вакуупупу
+<!-- Панель, содержащая внутренние панели. -->
+<?php $this->start('myphotos') ?>
+
+	<?php echo $this->element('Lovesafe.uploadfiles', [
+		'start_end_form' => true,
+		'label_submit' => 'Загрузить',
+		'class' => 'uploadfiles__form',
+	]) ?>
+
+	<?php echo $this->element('Lovesafe.panel', [
+		'panel_class' => 'uploadfiles-panel',
+		'panel' => [
+			'uploadfiles' => [8, 'uploadfiles-panel__submit-upload'],
+		]
+	]) ?>
+
+	<?php echo $this->element('Lovesafe.panel', [
+		'panel' => [
+			'countphoto' => [8, '_display_hide'],
+		],
+	]) ?>
+
+	<!-- Листинг фотографий. -->
+	<?php echo $this->element('Lovesafe.previewphoto', [
+		'urls_images' => (isset($urls_images) and $urls_images) ? $urls_images : null,
+	]) ?>
+
 <?php $this->end() ?>
 
 <?php echo $this->element('Lovesafe.panel', [
-	'panel_class' => 'uploadfiles uploadfiles_display_formupload i-bem',
+	'panel_class' => 'uploadfiles i-bem',
 	'data_bem' => '{ "uploadfiles":{} }',
 	'panel' => [
-		'panelleft' => [2, '_display_square _direction_center'],
-		'panelright' => [6, '_direction_center'],
-		'panelindicator' => [8, 'uploadfiles__indicator'],
+		'myphotos' => [8],
 	]
 ]) ?>
 
-<!-- Листинг фотографий. -->
-<?php echo $this->element('Lovesafe.previewphoto', [
-	'urls_images' => (isset($urls_images) and $urls_images) ? $urls_images : null,
-]) ?>
+
+
+

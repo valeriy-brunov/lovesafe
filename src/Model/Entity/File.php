@@ -5,6 +5,10 @@ namespace Lovesafe\Model\Entity;
 
 use Cake\ORM\Entity;
 
+use Cake\Core\Configure;
+use Cake\Core\Configure\Engine\PhpConfig;
+use Lovesafe\Plugin as LovesafePlugin;
+
 /**
  * File Entity
  *
@@ -26,11 +30,9 @@ use Cake\ORM\Entity;
 class File extends Entity
 {
     /**
-     * Fields that can be mass assigned using newEntity() or patchEntity().
+     * Поля, которые могут быть массово назначены с помощью newEntity() or patchEntity().
      *
-     * Note that when '*' is set to true, this allows all unspecified fields to
-     * be mass assigned. For security purposes, it is advised to set '*' to false
-     * (or remove it), and explicitly make individual fields accessible as needed.
+     * Обратите внимание, что если '*' имеет значение true, то это позволяет массово назначать все неопределенные поля. В целях безопасности * * рекомендуется установить '*' в значение false (или удалить его) и явно сделать отдельные поля доступными по мере необходимости.
      *
      * @var array
      */
@@ -48,4 +50,46 @@ class File extends Entity
         'password' => true,
         'comments' => true,
     ];
+
+    /**
+     * Аксессор "url".
+     */
+    protected function _getUrl( $url )
+    {
+        return $url;
+    }
+
+    /**
+     * Аксессор "filemime".
+     */
+    protected function _getFilemime( $filemime )
+    {
+        return $filemime;
+    }
+
+    /**
+     * Аксессор "small_url".
+     */
+    protected function _getSmallUrl()
+    {
+        $part1 = substr( $this->url, 0, 2 );
+        $part2 = substr( $this->url, 2, 2 );
+        $end = substr( $this->url, 4 );
+        $url = $part1 . '-' . $part2 . '-' . $end;
+
+        // Загружаем файл конфигурации 'files_default'.
+        // use Lovesafe\Plugin as LovesafePlugin;
+        $plugin = new LovesafePlugin();
+        Configure::config( 'default', new PhpConfig( $plugin->getPath() . 'config/' ) );
+        Configure::load( 'upload_files_default' );
+        $ext = Configure::read( 'ext' );
+
+        // Ищем в массиве конфигурации расширение файла.
+        foreach( $ext as $key => $val ) {
+            $key_ = array_search( $this->filemime, $ext[$key] );
+            if ( $key_ !== false ) break;
+        }
+
+        return DS . 'img' . DS . 'small-' . $url . '.' . $key;
+    }
 }

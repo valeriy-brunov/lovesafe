@@ -49,14 +49,14 @@ use Laminas\Diactoros\Stream;
  */
 class UploadfilesComponent extends Component
 {
-   /**
-    * Default configuration.
-    *
-    * @var array
-    */
-  	protected $_defaultConfig = [];
+  /**
+   * Default configuration.
+   *
+   * @var array
+   */
+  protected $_defaultConfig = [];
 
-  	/**
+  /**
 	 * Исходные размеры изображения.
 	 *
 	 * @var int
