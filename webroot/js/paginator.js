@@ -43,6 +43,34 @@
  *    блоков "paginator" и "paste" должны совпадать) запрашивает очередную порцию данных у AJAX-кода. AJAX-код, который будет возвращать
  *    порциями данные, должен располагаться в другом блоке и может при запросе очередных данных изменять режимы отображения дополнительных
  *    элементов блока "paste".
+ * 3. Пример взаимодействия блоков "paste", "paginator" и блока "controllerfiles", содержащий AJAX-код для совершения пагинации.
+ *
+ *	  {
+ *      "paste":{ "channel":"listcomments" },
+ *      "paginator":{ "channel":"listcomments", "channelnext":"nextcomments" },
+ *	    "controllerfiles":{}
+ *    }
+ *
+ *    В приведённом выше примере блок "controllerfiles" должен содержать именной канал слушателя события "next", которое возникает при
+ *	  клике по надписи "смотреть ещё...":
+ *
+ *    channels( 'nextcomments' ).on( 'next', function( event, url_ ) {
+ *      var url = url_;
+ *		  $.ajax({
+ *				url: url,
+ *				...
+ *				beforeSend: function( xhr ) {
+ *          channels( 'listcomments' ).emit( 'wait' );
+ *        },
+ *        success: function( html ) {
+ *          channels( 'listcomments' ).emit( 'insert', html );
+ * 				},
+ *				...
+ *			});
+ *		});
+ *
+ *		Обратите внимание, что событие "next" именного канала "nextcomments" передаёт параметр "_url". Этот параметр содержит
+ *		адрес AJAX-запроса, а также "get" параметр "page".
  */
 modules.define('paginator', ['i-bem-dom', 'events__channels', 'jquery'], function(provide, bemDom, channels, $) {
 
@@ -73,59 +101,59 @@ provide(bemDom.declBlock(this.name,
 		 */
 		onSetMod: {
 			'js': {
-			// Конструктор экземпляра.
-			'inited': function() {
+				// Конструктор экземпляра.
+				'inited': function() {
 
-				// Объекты для работы.
-				this._object = this.findChildElem( 'object' );
+					// Объекты для работы.
+					this._object = this.findChildElem( 'object' );
 
-				// События.
-				// Устанавливаем событие на объект (элемент) пагинации (например, "смотреть ещё").
-				if ( this._object && !this.params.autopaginator ) {
-					this._domEvents( this._object ).on( 'click', function( event ) {
-						event.preventDefault();
-						this._nextPaginator();
-					});
+					// События.
+					// Устанавливаем событие на объект (элемент) пагинации (например, "смотреть ещё").
+					if ( this._object && !this.params.autopaginator ) {
+						this._domEvents( this._object ).on( 'click', function( event ) {
+							event.preventDefault();
+							this._nextPaginator();
+						});
+					}
+
+			    // Если включена верхняя автопагинация.
+			    if ( this._object && this.params.autopaginator == 'top' ) {
+			      this._domEvents().on( 'scroll', { mythis : this }, function( event ) {
+			        if ( event.data.mythis.domElem.scrollTop() == 0 ) {
+			          // Скролл достиг верха.
+			          event.data.mythis._nextPaginator();
+			        }
+			      });
+			    }
+
+			    // Если включена нижняя автопагинация.
+			    if ( this._object && this.params.autopaginator == 'bottom' ) {
+			      this._domEvents().on( 'scroll', { mythis : this }, function( event ) {
+			        let height_top = event.data.mythis.domElem.scrollTop();
+			        let height_win = this.domElem.height();
+			        if ( (height_win + height_top) >= this.domElem[0].scrollHeight ) {
+			          // Скролл достиг низа.
+			          event.data.mythis._nextPaginator();
+			        }
+			      });
+			    }
+
+					// Вставка привязанным к пагинатору блоком "paste" html-кода.
+					if ( this.params.channel ) {
+						channels( this.params.channel ).on( 'insert', { mythis : this }, function( event ) {
+							let page = event.data.mythis.findChildElem( 'page' );
+							if ( page ) {
+								channels( event.data.mythis.params.channel ).emit( 'init' );
+							}
+							else {
+								channels( event.data.mythis.params.channel ).emit( 'reset' );
+							}
+						});
+					}
+
 				}
-
-        // Если включена верхняя автопагинация.
-        if ( this._object && this.params.autopaginator == 'top' ) {
-          this._domEvents().on( 'scroll', { mythis : this }, function( event ) {
-            if ( event.data.mythis.domElem.scrollTop() == 0 ) {
-              // Скролл достиг верха.
-              event.data.mythis._nextPaginator();
-            }
-          });
-        }
-
-        // Если включена нижняя автопагинация.
-        if ( this._object && this.params.autopaginator == 'bottom' ) {
-          this._domEvents().on( 'scroll', { mythis : this }, function( event ) {
-            let height_top = event.data.mythis.domElem.scrollTop();
-            let height_win = this.domElem.height();
-            if ( (height_win + height_top) >= this.domElem[0].scrollHeight ) {
-              // Скролл достиг низа.
-              event.data.mythis._nextPaginator();
-            }
-          });
-        }
-
-				// Вставка привязанным к пагинатору блоком "paste" html-кода.
-				if ( this.params.channel ) {
-					channels( this.params.channel ).on( 'insert', { mythis : this }, function( event ) {
-						let page = event.data.mythis.findChildElem( 'page' );
-						if ( page ) {
-							channels( event.data.mythis.params.channel ).emit( 'init' );
-						}
-						else {
-							channels( event.data.mythis.params.channel ).emit( 'reset' );
-						}
-					});
-				}
-
 			}
-		}
-    },
+	  },
 
 		/**
 		 * Создаёт событие именного канала на получение следующей порции данных пагинации.

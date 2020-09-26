@@ -69,7 +69,7 @@
 
 <!-- Количество фотографий. -->
 <?php $this->start('countphoto') ?>
-  <span class="fonts fonts_bold">Мои фотографии (0)</span>
+  <span class="fonts fonts_bold">Мои фотографии (<?= $count_images ?>)</span>
 <?php $this->end() ?>
 
 <!-- Панель, содержащая внутренние панели. -->

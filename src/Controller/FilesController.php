@@ -29,7 +29,7 @@ class FilesController extends AppController
         parent::initialize();
         $this->loadComponent( 'Lovesafe.Uploadfiles' );
         $this->loadComponent( 'FormProtection' );
-        $this->loadComponent('Paginator');
+        $this->loadComponent( 'Paginator' );
     }
 
     /**
@@ -44,7 +44,6 @@ class FilesController extends AppController
      */
     public function index()
     {
-        //echo('1111111111111111111111111');
         // Если запрашивают страницу через AJAX меняем основной шаблон.
         if ( $this->request->is('ajax') and $this->request->is('post') ) {
 
@@ -107,13 +106,15 @@ class FilesController extends AppController
                 ])
                 ->order(['created' => 'DESC']);
 
+            $this->set( 'count_images', $query->count() );
+
             $array = $this->paginate($query)->toArray();
 
             if ( count($array) ) {
                 foreach ($array as $obj) {
                     $urls_images[] = $obj->small_url;
                 }
-                $this->set('urls_images', $urls_images);
+                $this->set( 'urls_images', $urls_images );
             }
         }
     }
