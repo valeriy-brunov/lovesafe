@@ -4,6 +4,16 @@
  */
 ?>
 
+<?php $this->Paginator->setTemplates([
+	'nextActive' => '
+		<div class="paste2__delete paste2__delete_hide paste2__delete paginator__page">
+			<input type="hidden" name="page" value="{{url}}">
+		</div>
+		<div class="paste2__trubber paste2__trubber_hide">загрузка...</div>
+		<div class="paste2__other paste2__other_hide paginator__object">смотреть ещё...</div>',
+	'nextDisabled' => '',
+]) ?>
+
 <?php $this->start( 'not_photos' ) ?>
 	<div class="not-photos">
 		<div>
@@ -16,6 +26,7 @@
 
 <?php if ( isset($urls_images) and count($urls_images) ): ?>
 
+	<!-- Если у пользователя есть загруженные фотографии. -->
 	<?php $i = 0; ?>
 	<?php foreach ($urls_images as $urls_image): ?>
 		<?php $name = 'previewphoto' . $i; ?>
@@ -32,12 +43,16 @@
 		'panel_class' => 'previewphoto uploadfiles__previewphoto switch-visibility-blocks paste i-bem',
 		'add_class_panel_col' => 'previewphoto__panel',
 		'panel' => $panel,
-		'data_bem' => '{ "paste":{ "channel":"newphoto" } }',
+		'data_bem' => '{ "paste":{ "channel":"newphoto" }, "paste2":{ "channel":"newpagination" }, "paginator":{ "channel":"newpagination", "channelnext":"nextphoto" }, "controllerfiles":{} }',
 		'addstarthtml' => '<div class="paste__delete paste__delete_hide"></div>',
+		'addendhtml' => $this->Paginator->next(),
 	]) ?>
+
+	<?php echo $this->Html->script('Lovesafe.controllerfiles', ['block' => true]) ?>
 
 <?php else: ?>
 
+	<!-- Если у пользователя нет загруженных фотографий. -->
 	<?php echo $this->element('Lovesafe.panel', [
 		'panel_class' => 'previewphoto uploadfiles__previewphoto switch-visibility-blocks paste i-bem',
 		'add_class_panel_col' => 'previewphoto__panel',

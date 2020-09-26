@@ -57,6 +57,16 @@
 
 <?php $this->end() ?>
 
+<!-- Индикатор загрузки файлов. -->
+<?php $this->start('indicator_uploadfiles') ?>
+
+	<div class="uploadfiles__indicator">
+		<span class="uploadfiles__proc">0%</span>
+		<div class="uploadfiles__color"></div>
+	</div>
+
+<?php $this->end() ?>
+
 <!-- Количество фотографий. -->
 <?php $this->start('countphoto') ?>
   <span class="fonts fonts_bold">Мои фотографии (0)</span>
@@ -72,12 +82,20 @@
 	]) ?>
 
 	<?php echo $this->element('Lovesafe.panel', [
-		'panel_class' => 'uploadfiles-panel',
+		'panel_class' => 'uploadfiles-panel uploadfiles__button',
 		'panel' => [
 			'uploadfiles' => [8, 'uploadfiles-panel__submit-upload'],
 		]
 	]) ?>
 
+	<?php echo $this->element('Lovesafe.panel', [
+		'panel_class' => 'uploadfiles__indicator-upload',
+		'panel' => [
+			'indicator_uploadfiles' => [8],
+		]
+	]) ?>
+
+	<!-- Количество фотографий -->
 	<?php echo $this->element('Lovesafe.panel', [
 		'panel' => [
 			'countphoto' => [8, '_display_hide'],
@@ -92,13 +110,9 @@
 <?php $this->end() ?>
 
 <?php echo $this->element('Lovesafe.panel', [
-	'panel_class' => 'uploadfiles i-bem',
+	'panel_class' => 'uploadfiles uploadfiles_display_formupload i-bem',
 	'data_bem' => '{ "uploadfiles":{} }',
 	'panel' => [
 		'myphotos' => [8],
 	]
 ]) ?>
-
-
-
-

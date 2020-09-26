@@ -30,6 +30,7 @@
  *
  * Пример "чистого" шаблона:
  * <div class="paste i-bem" data-bem='{ "paste" : {"channel":"mychannel","init":{"other":true}} }'>
+ *  <!-- Дополнительные элементы. -->
  *  <div class="paste__trubber paste__trubber_hide">...</div>
  *  <div class="paste__other paste__other_hide">...</div>
  *  <div class="paste__delete paste__delete_hide">...</div>
@@ -37,13 +38,13 @@
  * Обратите внимание, что у каждого элемента указан модификатор "hide", его необходимо указывать обязательно.
  *
  * Пример событий:
- *    Режим ожидания:
+ *    Режим ожидания ( указывается в AJAX-методе beforeSend: function( xhr ) {} ):
  *      channels( 'text-new-messages' ).emit( 'wait' );
- *    Режим вставки:
+ *    Режим вставки ( указывается в AJAX-методе success: function( html ) {} ):
  *      channels( 'text-new-messages' ).emit( 'insert', html );
- *    Стартовый режим:
+ *    Стартовый режим ( сразу после загрузки страницы ):
  *      channels( 'text-new-messages' ).emit( 'init' );
- *    Режим сброса:
+ *    Режим сброса ( скрывает все дополнительные элементы ):
  *      channels( 'text-new-messages' ).emit( 'reset' );
  *
  * Вышеприведенный команды с режимами рекомендуется указывать в коде содержащий AJAX-запрос.
@@ -218,23 +219,5 @@ provide(bemDom.declBlock(this.name,
   }
 
 ));
-
-});
-
-/**
- * БЛОК "paste2".
- */
-modules.define('paste2', ['i-bem-dom', 'paste', 'events__channels', 'jquery'], function(provide, bemDom, paste, channels, $) {
-
-provide(bemDom.declBlock(this.name, paste, {}, {} ));
-
-});
-
-/**
- * БЛОК "paste3".
- */
-modules.define('paste3', ['i-bem-dom', 'paste', 'events__channels', 'jquery'], function(provide, bemDom, paste, channels, $) {
-
-provide(bemDom.declBlock(this.name, paste, {}, {} ));
 
 });

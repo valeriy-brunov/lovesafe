@@ -4,6 +4,14 @@
  */
 ?>
 
+<?php $this->Paginator->setTemplates([
+	'nextActive' => '
+		<div class="paste2__delete paste2__delete_hide paste2__delete paginator__page">
+			<input type="hidden" name="page" value="{{url}}">
+		</div>',
+	'nextDisabled' => '',
+]) ?>
+
 <?php if ( isset($urls_images) and count($urls_images) ): ?>
 
 	<?php $i = 0; ?>
@@ -20,7 +28,7 @@
 		'panel' => $panel,
 		'add_class_panel_col' => 'previewphoto__panel',
 		'wrap' => 1,
-		'addstarthtml' => '<div class="paste__delete paste__delete_hide"></div>',
+		'addendhtml' => $this->Paginator->next(),
 	]) ?>
 
 <?php endif; ?>

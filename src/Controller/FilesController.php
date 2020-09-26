@@ -29,7 +29,13 @@ class FilesController extends AppController
         parent::initialize();
         $this->loadComponent( 'Lovesafe.Uploadfiles' );
         $this->loadComponent( 'FormProtection' );
+        $this->loadComponent('Paginator');
     }
+
+    /**
+     * Пагинатор.
+     */
+    public $paginate = ['limit' => 5];
 
     /**
      * Index method
@@ -40,7 +46,7 @@ class FilesController extends AppController
     {
         //echo('1111111111111111111111111');
         // Если запрашивают страницу через AJAX меняем основной шаблон.
-        if ( $this->request->is('ajax') ) {
+        if ( $this->request->is('ajax') and $this->request->is('post') ) {
 
             $this->Uploadfiles->upload();
             $this->set( 'urls_images', $this->Uploadfiles->urlsImages( 'small' ) );
@@ -67,22 +73,48 @@ class FilesController extends AppController
             // Вид.
             $this->render('ajax_imgs');
         }
-        else {
+        elseif ( $this->request->is('ajax') and $this->request->is('get') ) {
             // Выводим все фотографии владельца фотографий.
-            $array = $this->Files
+            $query = $this->Files
                 ->find()
                 ->where([
                     'password_id' => 2,
                     'status' => 1,
                 ])
-                ->order(['created' => 'DESC'])
-                ->toArray();
+                ->order(['created' => 'DESC']);
 
-            foreach ($array as $obj) {
-                $urls_images[] = $obj->small_url;
+            $array = $this->paginate($query)->toArray();
+
+            if ( count($array) ) {
+                foreach ($array as $obj) {
+                    $urls_images[] = $obj->small_url;
+                }
+                $this->set('urls_images', $urls_images);
             }
 
-            $this->set('urls_images', $urls_images);
+            // Основной шаблон.
+            $this->viewBuilder()->setLayout( 'ajax' );
+            // Вид.
+            $this->render('ajax_imgs');
+        }
+        else {
+            // Выводим все фотографии владельца фотографий.
+            $query = $this->Files
+                ->find()
+                ->where([
+                    'password_id' => 2,
+                    'status' => 1,
+                ])
+                ->order(['created' => 'DESC']);
+
+            $array = $this->paginate($query)->toArray();
+
+            if ( count($array) ) {
+                foreach ($array as $obj) {
+                    $urls_images[] = $obj->small_url;
+                }
+                $this->set('urls_images', $urls_images);
+            }
         }
     }
 

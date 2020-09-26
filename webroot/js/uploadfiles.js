@@ -1,5 +1,5 @@
 /**
- * БЛОК "uploadfiles".
+ * УНИВЕРСАЛЬНЫЙ БЛОК "uploadfiles".
  *
  * Блок предназначен для загрузки файлов на сервер методом AJAX с индикацией.
  *
@@ -41,30 +41,20 @@ provide(bemDom.declBlock(this.name,
           this.submit_upload = this.findChildElem( 'submit' );
           this.button_change_files = this.findChildElem( 'button-change-files' );
           this.form = this.findChildElem( 'form' );
-          //this.value_text = this.findChildElem( 'value-text' );
-          //this.value = this.findChildElem( 'value' );
+          this.value_text = this.findChildElem( 'proc' );
+          this.value = this.findChildElem( 'color' );
 
           // События.
           // Нажатие кнопки выбора файла.
           this._domEvents( this.button_change_files ).on( 'click', function( event ) {
+			event.preventDefault();
             this.input_form.domElem.click();
-            return false;
           });
 
           // Файлы для загрузки выбраны.
           this._domEvents( this.input_form ).on( 'change', function( event ) {
             var mythis = this;
-            //this.toggleMod( 'display', 'formupload', 'indicator' );
-            
-            
-            //var token_fields = this.form.domElem.find( 'input[name="_Token[fields]"]' ).val();
-            //var token_unlocked = this.form.domElem.find( 'input[name="_Token[unlocked]"]' ).val();
-             //var data = {
-               //_Token: [{
-                 //'fields': token_fields,
-                 //'unlocked': token_unlocked,
-              // }]
-            //};
+            this.toggleMod( 'display', 'formupload', 'indicator' );
             // Указываем на <form> через функцию javascript.
             let id = this.form.domElem.attr( 'id' );
             var formData = new FormData( document.getElementById( id ) );
@@ -77,8 +67,12 @@ provide(bemDom.declBlock(this.name,
               processData: false,
               contentType: false,
               beforeSend: function( xhr ) {
-                //xhr.setRequestHeader( 'X-CSRF-Token', token_fields );
+                channels( 'newphoto' ).emit( 'wait' );
+                let percentComplete = 0;
+                mythis.value_text.domElem.text( percentComplete + "%" );
+                mythis.value.domElem.css( 'width', percentComplete + "%" );
               },
+              // Процесс загрузки файлов.
               xhr: function() {
                 var xhr = $.ajaxSettings.xhr();
                 xhr.upload.addEventListener( 'progress', function( evt ) {
@@ -88,25 +82,20 @@ provide(bemDom.declBlock(this.name,
                     let percentComplete = Math.ceil( evt.loaded / evt.total * 100 );
                     // Двигаем прогресс загрузки.
                     //this.prog = percentComplete;
-                //    mythis.value_text.domElem.text( percentComplete + "%" );
-                //    mythis.value.domElem.css( 'width', percentComplete + "%" );
+                    mythis.value_text.domElem.text( percentComplete + "%" );
+                    mythis.value.domElem.css( 'width', percentComplete + "%" );
                   }
                 }, false);
                 return xhr;
               },
+              // Данные успешно получены.
               success: function( html ) {
-                //mythis.toggleMod( 'display', 'formupload', 'indicator' );
-                // Принимаем в заголовке токен и изменяем значение скрытого поля "_csrfToken".
-                //var token = request.getResponseHeader('X-CSRF-Token');
-                //var request = new XMLHttpRequest();
-                //var csrfToken = request.getResponseHeader('X-CSRF-Token');
-                //$( 'input[name="_csrfToken"]' ).val( token );
-                //bemDom.before( object.domElem );
-                //console.log(html);
+                mythis.toggleMod( 'display', 'formupload', 'indicator' );
                 channels( 'newphoto' ).emit( 'insert', html );
               },
+              // Ошибка при выполнение запроса.
               error: function( data ) {
-                console.log(data);
+                console.log( data );
               },
             });
           });
