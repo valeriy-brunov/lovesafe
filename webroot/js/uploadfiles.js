@@ -67,7 +67,7 @@ provide(bemDom.declBlock(this.name,
               processData: false,
               contentType: false,
               beforeSend: function( xhr ) {
-                channels( 'newphoto' ).emit( 'wait' );
+                //channels( 'newphoto' ).emit( 'wait' );
                 let percentComplete = 0;
                 mythis.value_text.domElem.text( percentComplete + "%" );
                 mythis.value.domElem.css( 'width', percentComplete + "%" );

@@ -12,13 +12,13 @@
 	'nextDisabled' => '',
 ]) ?>
 
-<?php if ( isset($urls_images) and count($urls_images) ): ?>
+<?php if ( isset($obj_images) and count($obj_images) ): ?>
 
 	<?php $i = 0; ?>
-	<?php foreach ($urls_images as $urls_image): ?>
+	<?php foreach ($obj_images as $obj_image): ?>
 		<?php $name = 'previewphoto' . $i; ?>
 		<?php $this->start($name) ?>
-			<div class="previewphoto__photo" style="background-image: url('<?= $this->Url->build($urls_image, ['fullBase' => true]) ?>')"></div>
+			<div class="previewphoto__photo" style="background-image: url('<?= $this->Url->build($obj_image->small_url, ['fullBase' => true]) ?>')" data-fid="<?= $obj_image->id ?>"></div>
 		<?php $this->end() ?>
 		<?php $panel[$name] = [2, '_display_square switch-visibility-blocks__one']; ?>
 		<?php $i++; ?>

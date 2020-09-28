@@ -12,6 +12,7 @@ use Lovesafe\Plugin as LovesafePlugin;
 
 use Cake\Network\Exception\NotFoundException;
 //use Cake\Http\CallbackStream;
+//use Cake\Collection\Collection;
 
 /**
  * Files Controller
@@ -35,7 +36,7 @@ class FilesController extends AppController
     /**
      * Пагинатор.
      */
-    public $paginate = ['limit' => 5];
+    public $paginate = ['limit' => 8];
 
     /**
      * Index method
@@ -48,8 +49,10 @@ class FilesController extends AppController
         if ( $this->request->is('ajax') and $this->request->is('post') ) {
 
             $this->Uploadfiles->upload();
-            $this->set( 'urls_images', $this->Uploadfiles->urlsImages( 'small' ) );
-
+            $a = $this->Uploadfiles->urlsImages();
+            $this->set( 'obj_images', $a );
+// $session = $this->getRequest()->getSession();
+// $session->write('d.d', $a);
             // // Кодировка ответа.
             // $this->response = $this->response->withCharset('UTF-8');
             // // Отключить кеширование.
@@ -70,7 +73,7 @@ class FilesController extends AppController
             // Основной шаблон.
             $this->viewBuilder()->setLayout( 'ajax' );
             // Вид.
-            $this->render('ajax_imgs');
+            $this->render('ajax_imgs_start');
         }
         elseif ( $this->request->is('ajax') and $this->request->is('get') ) {
             // Выводим все фотографии владельца фотографий.
@@ -85,18 +88,17 @@ class FilesController extends AppController
             $array = $this->paginate($query)->toArray();
 
             if ( count($array) ) {
-                foreach ($array as $obj) {
-                    $urls_images[] = $obj->small_url;
-                }
-                $this->set('urls_images', $urls_images);
+                $this->set( 'obj_images', $array );
             }
 
             // Основной шаблон.
             $this->viewBuilder()->setLayout( 'ajax' );
             // Вид.
-            $this->render('ajax_imgs');
+            $this->render('ajax_imgs_end');
         }
         else {
+            // $session = $this->getRequest()->getSession();
+            // dump($session->read('d.d'));
             // Выводим все фотографии владельца фотографий.
             $query = $this->Files
                 ->find()
@@ -111,10 +113,7 @@ class FilesController extends AppController
             $array = $this->paginate($query)->toArray();
 
             if ( count($array) ) {
-                foreach ($array as $obj) {
-                    $urls_images[] = $obj->small_url;
-                }
-                $this->set( 'urls_images', $urls_images );
+                $this->set( 'obj_images', $array );
             }
         }
     }

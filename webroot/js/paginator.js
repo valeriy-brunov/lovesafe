@@ -71,6 +71,38 @@
  *
  *		Обратите внимание, что событие "next" именного канала "nextcomments" передаёт параметр "_url". Этот параметр содержит
  *		адрес AJAX-запроса, а также "get" параметр "page".
+ * 4. После щелчка по "смотреть ещё...", блоку "paste" ,будет установлен режим "wait". Как только данные от сервера возвратяться
+ *		AJAX-коду ввиде html-разметки, блоку "paste" будет установлен режим "insert" (вставка). Режим вставки заменит элемент
+ *		"paste__delete" на данные пришедшие с сервера. Если внутри присланных данных будет присутствовать скрытое поле с именем
+ *		name="page", то js-код пагинатора установит блоку "paste" режим "init" (начальный режим), обычно в этом режиме показывается
+ *		"смотреть ещё...". Если же скрытое поле не будетнайдено js-кодом пагинатора, то блоку "paste" установят режим "reset"
+ *		(обычно в этом режиме скрыты все вспомогательные элементы).
+ * 5. Рекомендации по вёрстке вспомогательных блоков "paste" и "paginator".
+ *
+ *		Для первой загрузке страницы необходимо использовать шаблон:
+ *
+ *		<?php $this->Paginator->setTemplates([
+ *			'nextActive' => '
+ *				<div class="paste__delete paste__delete_hide paste__delete paginator__page">
+ *					<input type="hidden" name="page" value="{{url}}">
+ *				</div>
+ *				<div class="paste__trubber paste__trubber_hide">загрузка...</div>
+ *				<div class="paste__other paste__other_hide paginator__object">смотреть ещё...</div>',
+ *			'nextDisabled' => '',
+ *		]) ?>
+ *		<?php echo $this->Paginator->next() ?>
+ *
+ *		Для страницы запрашиваемой через AJAX:
+ *
+ *		<?php $this->Paginator->setTemplates([
+ *			'nextActive' => '
+ *				<div class="paste2__delete paste2__delete_hide paste2__delete paginator__page">
+ *					<input type="hidden" name="page" value="{{url}}">
+ *				</div>',
+ *			'nextDisabled' => '',
+ *		]) ?>
+ *
+ *		<?php echo $this->Paginator->next() ?>
  */
 modules.define('paginator', ['i-bem-dom', 'events__channels', 'jquery'], function(provide, bemDom, channels, $) {
 

@@ -104,7 +104,7 @@
 
 	<!-- Листинг фотографий. -->
 	<?php echo $this->element('Lovesafe.previewphoto', [
-		'urls_images' => (isset($urls_images) and $urls_images) ? $urls_images : null,
+		'obj_images' => (isset($obj_images) and count($obj_images)) ? $obj_images : null,
 	]) ?>
 
 <?php $this->end() ?>

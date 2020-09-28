@@ -13,6 +13,7 @@ use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Network\Exception\NotFoundException;
 use Lovesafe\Plugin as LovesafePlugin;
 use Laminas\Diactoros\Stream;
+use Cake\Collection\Collection;
 
 /**
  * Uploadfiles component
@@ -176,14 +177,21 @@ class UploadfilesComponent extends Component
 	protected $_urls = [];
 
 	/**
+	 * Содержит массив данных всех записанных данных в ТБ БД "Files".
+	 *
+	 * @var array
+	 */
+	protected $_array = [];
+
+	/**
 	 * Выполняем необходимые настройки компонента.
 	 */
 	public function initialize( array $config ): void
   	{
 		// Cake\Http\ServerRequest
-		//$this->_request = $config['request'];
 		$this->_request = $this->getController()->getRequest();
 		$this->_urls = [];
+		$this->_array = [];
 
 		// Загружаем файл конфигурации 'files_default'.
 		// use Lovesafe\Plugin as LovesafePlugin;
@@ -351,8 +359,17 @@ class UploadfilesComponent extends Component
 		// Проверяем на наличие ошибок.
 		if ( $this->getController()->Files->save( $myfile ) ) {
          	$this->getController()->Flash->success( __('Файл успешно записан в БД!') );
-         	// Запоминаем id загруженного файла.
-			$this->_fid[] = $myfile->id;
+			// Запоминаем все данные занесённые в БД.
+			$this->_array[] = [
+				'id' => $myfile->id,
+				'url' => $myfile->url,
+				'filename' => $myfile->filename,
+				'filesize' => $myfile->filesize,
+				'filemime' => $myfile->filemime,
+				'k' => $myfile->k,
+				'status' => $myfile->status,
+				'created' => $myfile->created,
+			];
       	}
       	else $this->getController()->Flash->error( __('Ошибка!') );
 		// Обнуляем размер загруженного изображения для одного цикла.
@@ -432,14 +449,6 @@ class UploadfilesComponent extends Component
 	}
 
 	/**
-	 * Возвращает массив fid загруженных файлов за одну сессию.
-	 */
-	public function fid()
-	{
-		return $this->_fid;
-	}
-
-	/**
 	 * Возвращает размер в байтах всех загруженных файлов за одну сессию. Если загружалось изображение, то для каждого преобразования
 	 * размер указывается отдельно.
 	 */
@@ -463,19 +472,49 @@ class UploadfilesComponent extends Component
 	}
 
 	/**
-	 * Возвращает пути к только что загруженным картинкам.
-	 *
-	 * @param {string} $format Формат картинки, например, "big" или "small".
-	 * @return {array} Путь до картинки.
+	 * Возвращает данные записанные в таблицу "Files".
 	 */
-	public function urlsImages( $format )
+	public function datauploadfiles()
 	{
-		if ( !$this->_urls ) return null;
+		return $this->_array;
+	}
 
-		foreach (array_unique($this->_urls) as $key => $value) {
-			$new_array[] = '/img/' . $format . '-' . $value;
-		}
-		return $new_array;
+	/**
+	 * Возвращает данные записанные в таблицу "Files", добавляя ячейки для "small" и "big" фотографий.
+	 *
+	 * @return {array} Данные записанные в таблицу "Files".
+	 */
+	public function urlsImages()
+	{
+		// Загружаем файл конфигурации 'files_default'.
+        // use Lovesafe\Plugin as LovesafePlugin;
+        $plugin = new LovesafePlugin();
+        Configure::config( 'default', new PhpConfig( $plugin->getPath() . 'config/' ) );
+        Configure::load( 'upload_files_default' );
+        $ext = Configure::read( 'ext' );
+
+  		// Создаём новую коллекцию.
+		$collection = new Collection( $this->_array );
+		$new_array = $collection->map(function ( $value, $key ) use ( $ext ) {
+			// Разделяем адрес на части, вставляя между частями знак "-" (тире).
+			$part1 = substr( $value['url'], 0, 2 );
+	        $part2 = substr( $value['url'], 2, 2 );
+	        $end = substr( $value['url'], 4 );
+	        $url = $part1 . '-' . $part2 . '-' . $end;
+
+			// Ищем в массиве конфигурации расширение файла.
+	        foreach( $ext as $key2 => $val ) {
+	            $key_ = array_search( $value['filemime'], $ext[$key2] );
+	            if ( $key_ !== false ) break;
+	        }
+
+	        // Изменяем значение адреса превью фотографии.
+			$value['small_url'] = DS . 'img' . DS . 'small-' . $url . '.' . $key2;
+			$value['big_url'] = DS . 'img' . DS . 'big-' . $url . '.' . $key2;
+			return (object)$value;
+		});
+
+	    return $new_array->toArray();
 	}
 
 }
