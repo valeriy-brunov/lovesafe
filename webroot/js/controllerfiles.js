@@ -37,16 +37,12 @@ provide(bemDom.declBlock(this.name,
         // Конструктор экземпляра.
         'inited': function() {
 
-          // Объекты для работы:
-          this._photos = this.findChildElems( 'previewphoto-photo' );
-
           // События.
           // Щелчок по превью фотографии вызовёт открытие модального окна.
-          this._clickPhoto( this._photos );
+          this._clickPhoto();
 
           // Пагинатор запрашивает следующую страницу.
-          channels( 'nextphoto' ).on( 'next', { mythis : this }, function( event, url_ ) {
-            var mythis_ = event.data.mythis;
+          channels( 'nextphoto' ).on( 'next', function( event, url_ ) {
             var url = url_;
             $.ajax({
               url: url,
@@ -75,14 +71,14 @@ provide(bemDom.declBlock(this.name,
             // Чтобы инициализировать текущий блок, необходимо проделать следующие операции.
             let pr_photo = event.data.mythis.findChildElems( 'previewphoto-photo' ).domElem;
             bemDom.init( pr_photo );
-            event.data.mythis._clickPhoto( pr_photo );
+            event.data.mythis._clickPhoto();
           });
 
           // Произошла вставка html-разметка новых загруженных фотографий.
           channels( 'newphoto' ).on( 'insertend', { mythis : this }, function( event ) {
             let pr_photo = event.data.mythis.findChildElems( 'previewphoto-photo' ).domElem;
             bemDom.init( pr_photo );
-            event.data.mythis._clickPhoto( pr_photo );
+            event.data.mythis._clickPhoto();
           });
 
         }
@@ -97,7 +93,7 @@ provide(bemDom.declBlock(this.name,
      */
     _clickPhoto: function( obj ) {
       // Клик по любой фотографии.
-      this._domEvents( obj ).on( 'click', function( event ) {
+      this._domEvents( this.findChildElems( 'previewphoto-photo' ) ).on( 'click', function( event ) {
         // Открыть модальное окно.
         channels( 'modal-window' ).emit('openmodal', 'big_photo');
       });
