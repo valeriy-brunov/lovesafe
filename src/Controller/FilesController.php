@@ -49,8 +49,7 @@ class FilesController extends AppController
         if ( $this->request->is('ajax') and $this->request->is('post') ) {
 
             $this->Uploadfiles->upload();
-            $a = $this->Uploadfiles->urlsImages();
-            $this->set( 'obj_images', $a );
+            $this->set( 'obj_images', $this->Uploadfiles->urlsImages() );
 // $session = $this->getRequest()->getSession();
 // $session->write('d.d', $a);
             // // Кодировка ответа.

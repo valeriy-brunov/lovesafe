@@ -4,6 +4,11 @@
  * @var \App\Model\Entity\File[]|\Cake\Collection\CollectionInterface $files
  */
 ?>
+
+<?php echo $this->element('Lovesafe.modal-window', [
+	'name' => 'big_photo',
+]) ?>
+
 <!-- Имя пользователя. -->
 <?php $this->start('paneltitle') ?>
   Валерий

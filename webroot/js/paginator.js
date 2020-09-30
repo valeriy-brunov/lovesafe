@@ -148,27 +148,27 @@ provide(bemDom.declBlock(this.name,
 						});
 					}
 
-			    // Если включена верхняя автопагинация.
-			    if ( this._object && this.params.autopaginator == 'top' ) {
-			      this._domEvents().on( 'scroll', { mythis : this }, function( event ) {
-			        if ( event.data.mythis.domElem.scrollTop() == 0 ) {
-			          // Скролл достиг верха.
-			          event.data.mythis._nextPaginator();
-			        }
-			      });
-			    }
+					// Если включена верхняя автопагинация.
+					if ( this._object && this.params.autopaginator == 'top' ) {
+					  this._domEvents().on( 'scroll', { mythis : this }, function( event ) {
+						if ( event.data.mythis.domElem.scrollTop() == 0 ) {
+						  // Скролл достиг верха.
+						  event.data.mythis._nextPaginator();
+						}
+					  });
+					}
 
-			    // Если включена нижняя автопагинация.
-			    if ( this._object && this.params.autopaginator == 'bottom' ) {
-			      this._domEvents().on( 'scroll', { mythis : this }, function( event ) {
-			        let height_top = event.data.mythis.domElem.scrollTop();
-			        let height_win = this.domElem.height();
-			        if ( (height_win + height_top) >= this.domElem[0].scrollHeight ) {
-			          // Скролл достиг низа.
-			          event.data.mythis._nextPaginator();
-			        }
-			      });
-			    }
+					// Если включена нижняя автопагинация.
+					if ( this._object && this.params.autopaginator == 'bottom' ) {
+					  this._domEvents().on( 'scroll', { mythis : this }, function( event ) {
+						let height_top = event.data.mythis.domElem.scrollTop();
+						let height_win = this.domElem.height();
+						if ( (height_win + height_top) >= this.domElem[0].scrollHeight ) {
+						  // Скролл достиг низа.
+						  event.data.mythis._nextPaginator();
+						}
+					  });
+					}
 
 					// Вставка привязанным к пагинатору блоком "paste" html-кода.
 					if ( this.params.channel ) {
@@ -185,7 +185,7 @@ provide(bemDom.declBlock(this.name,
 
 				}
 			}
-	  },
+		},
 
 		/**
 		 * Создаёт событие именного канала на получение следующей порции данных пагинации.

@@ -47,7 +47,7 @@ provide(bemDom.declBlock(this.name,
           // События.
           // Нажатие кнопки выбора файла.
           this._domEvents( this.button_change_files ).on( 'click', function( event ) {
-			event.preventDefault();
+			      event.preventDefault();
             this.input_form.domElem.click();
           });
 

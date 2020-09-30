@@ -31,7 +31,7 @@
 	<?php foreach ($obj_images as $obj_image): ?>
 		<?php $name = 'previewphoto' . $i; ?>
 		<?php $this->start($name) ?>
-			<div class="previewphoto__photo" style="background-image: url('<?= $this->Url->build($obj_image->small_url, ['fullBase' => true]) ?>')" data-fid="<?= $obj_image->id ?>"></div>
+			<div class="previewphoto__photo controllerfiles__previewphoto-photo" style="background-image: url('<?= $this->Url->build($obj_image->small_url, ['fullBase' => true]) ?>')" data-fid="<?= $obj_image->id ?>"></div>
 		<?php $this->end() ?>
 		<?php $panel[$name] = [2, '_display_square switch-visibility-blocks__one']; ?>
 		<?php $i++; ?>
@@ -40,7 +40,7 @@
 	<?php $panel['not_photos'] = [8, '_display_hide switch-visibility-blocks__two']; ?>
 
 	<?php echo $this->element('Lovesafe.panel', [
-		'panel_class' => 'previewphoto uploadfiles__previewphoto switch-visibility-blocks paste paste2 i-bem',
+		'panel_class' => 'previewphoto uploadfiles__previewphoto switch-visibility-blocks paste paste2 controllerfiles i-bem',
 		'add_class_panel_col' => 'previewphoto__panel',
 		'panel' => $panel,
 		'data_bem' => '{ "paste":{ "channel":"newphoto" }, "paste2":{ "channel":"newpagination" }, "paginator":{ "channel":"newpagination", "channelnext":"nextphoto" }, "controllerfiles":{} }',
