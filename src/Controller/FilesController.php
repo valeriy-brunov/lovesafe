@@ -10,9 +10,7 @@ use Cake\Core\Configure;
 use Cake\Core\Configure\Engine\PhpConfig;
 use Lovesafe\Plugin as LovesafePlugin;
 
-use Cake\Network\Exception\NotFoundException;
-//use Cake\Http\CallbackStream;
-//use Cake\Collection\Collection;
+use Cake\Http\Exception\NotFoundException;
 
 /**
  * Files Controller
@@ -31,6 +29,7 @@ class FilesController extends AppController
         $this->loadComponent( 'Lovesafe.Uploadfiles' );
         $this->loadComponent( 'FormProtection' );
         $this->loadComponent( 'Paginator' );
+        $this->loadComponent( 'Lovesafe.Streamphoto' );
     }
 
     /**
@@ -141,7 +140,115 @@ class FilesController extends AppController
         // Заголовок.
         $this->response = $this->response->withHeader('Content-type', 'image/jpeg');
         $this->response = $this->response->withBody( $stream );
+
         return $this->response;
+    }
+
+    /**
+     * Возвращает текущую (по которой произощел щелчок) фотографию в виде потока.
+     */
+    public function currentphoto( $fid = null )
+    {
+        // Подключаемся к сессии.
+        $session = $this->request->getSession();
+
+        if ( $fid ) {
+
+            // Запрос на загрузку конкретной фотографии.
+            $session->write( 'currentphoto.fid', $fid );
+
+            $query = $this->Files
+                ->find()
+                ->where([
+                    'id' => $fid,
+                    'password_id' => 2,
+                    'status' => 1,
+                ])
+                ->first();
+
+            return $this->Streamphoto->send( $query->big_url );
+
+        }
+        else throw new NotFoundException( __('Такой фотографии нет на сервере!') );
+    }
+
+    /**
+     * Возвращает следующую фотографию в виде потока.
+     */
+    public function nextphoto()
+    {
+        // Подключаемся к сессии.
+        $session = $this->request->getSession();
+        if ( $session->check( 'currentphoto.fid' ) ) {
+
+            $fid_session = $session->read( 'currentphoto.fid' );
+            $session->write( 'currentphoto.fid', $fid_session + 1 );
+
+            $query = $this->Files
+                ->find()
+                ->where([
+                    'id >' => $fid_session,
+                    'password_id' => 2,
+                    'status' => 1,
+                ]);
+            $query_ = $query;
+
+            if ( $query_->count() == 0 ) {
+                $query = $this->Files
+                ->find()
+                ->where([
+                    'password_id' => 2,
+                    'status' => 1,
+                ]);
+            }
+
+            $query = $query->first();
+            $session->write( 'currentphoto.fid', $query->id );
+
+            return $this->Streamphoto->send( $query->big_url );
+        }
+        else throw new NotFoundException( __('Такой фотографии нет на сервере!') );
+    }
+
+    /**
+     * Возвращает предыдущую фотографию в виде потока.
+     */
+    public function prevphoto()
+    {
+        // Подключаемся к сессии.
+        $session = $this->request->getSession();
+        if ( $session->check( 'currentphoto.fid' ) ) {
+
+            $fid_session = $session->read( 'currentphoto.fid' );
+            $session->write( 'currentphoto.fid', $fid_session - 1 );
+
+            $query = $this->Files
+                ->find()
+                ->where([
+                    'id <' => $fid_session,
+                    'password_id' => 2,
+                    'status' => 1,
+                ])
+                ->order(['created' => 'ASC']);
+
+            $query_ = $query;
+
+            if ( $query_->count() == 0 ) {
+                $query = $this->Files
+                ->find()
+                ->where([
+                    'password_id' => 2,
+                    'status' => 1,
+                ])
+                ->order(['created' => 'ASC']);
+            }
+
+            $query = $query->first();
+            $session->write( 'currentphoto.fid', $query->id );
+
+            return $this->Streamphoto->send( $query->big_url );
+        }
+        else throw new NotFoundException( __('Такой фотографии нет на сервере!') );
     }
 
     /**

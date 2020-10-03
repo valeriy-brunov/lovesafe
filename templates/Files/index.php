@@ -7,6 +7,13 @@
 
 <?php echo $this->element('Lovesafe.modal-window', [
 	'name' => 'big_photo',
+	'class_block' => 'preview-big-photo',
+	'content' => '
+		<img src="#" class="preview-big-photo__img">
+		<a href="#" class="preview-big-photo__nextphoto">следующее</a>
+		<a href="#" class="preview-big-photo__prevphoto">предыдущее</a>
+	',
+	'data_bem' => '{ "preview-big-photo":{} }',
 ]) ?>
 
 <!-- Имя пользователя. -->

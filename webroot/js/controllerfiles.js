@@ -87,15 +87,14 @@ provide(bemDom.declBlock(this.name,
 
     /**
      * Устанавливает событие - щелчок по превью фотографии.
-     *
-     * @param {object} obj
-     *    Объект, при щелчке на который откроется модальное окно.
      */
-    _clickPhoto: function( obj ) {
+    _clickPhoto: function() {
       // Клик по любой фотографии.
       this._domEvents( this.findChildElems( 'previewphoto-photo' ) ).on( 'click', function( event ) {
+        let fid = event.currentTarget.dataset.fid;
+        channels( 'preview-big-photo' ).emit( 'view', fid );
         // Открыть модальное окно.
-        channels( 'modal-window' ).emit('openmodal', 'big_photo');
+        channels( 'modal-window' ).emit( 'openmodal', 'big_photo' );
       });
     },
 

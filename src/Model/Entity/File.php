@@ -72,6 +72,22 @@ class File extends Entity
      */
     protected function _getSmallUrl()
     {
+        return DS . 'img' . DS . 'small-' . $this->img_url;
+    }
+
+    /**
+     * Аксессор "big_url".
+     */
+    protected function _getBigUrl()
+    {
+        return DS . 'img' . DS . 'big-' . $this->img_url;
+    }
+
+    /**
+     * Аксессор "img_url".
+     */
+    protected function _getImgUrl()
+    {
         $part1 = substr( $this->url, 0, 2 );
         $part2 = substr( $this->url, 2, 2 );
         $end = substr( $this->url, 4 );
@@ -90,6 +106,6 @@ class File extends Entity
             if ( $key_ !== false ) break;
         }
 
-        return DS . 'img' . DS . 'small-' . $url . '.' . $key;
+        return $url . '.' . $key;
     }
 }
