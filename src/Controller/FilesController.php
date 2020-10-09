@@ -149,13 +149,25 @@ class FilesController extends AppController
      */
     public function currentphoto( $fid = null )
     {
-        // Подключаемся к сессии.
-        $session = $this->request->getSession();
-
         if ( $fid ) {
 
-            // Запрос на загрузку конкретной фотографии.
-            $session->write( 'currentphoto.fid', $fid );
+            $total_page = $this->Files
+                ->find()
+                ->where([
+                    'password_id' => 2,
+                    'status' => 1,
+                ])
+                ->count();
+
+            $current_page = $this->Files
+                ->find()
+                ->where([
+                    'id <=' => $fid,
+                    'password_id' => 2,
+                    'status' => 1,
+                ])
+                ->order([ 'id' => 'ASC' ])
+                ->count();
 
             $query = $this->Files
                 ->find()
@@ -166,10 +178,15 @@ class FilesController extends AppController
                 ])
                 ->first();
 
-            return $this->Streamphoto->send( $query->big_url );
+            $session = $this->request->getSession();
+            $session->write( 'bigphoto.total_page', $total_page );
+            $session->write( 'bigphoto.current_page', $current_page );
 
+            return $this->Streamphoto->send( $query->big_url );
         }
-        else throw new NotFoundException( __('Такой фотографии нет на сервере!') );
+        else {
+            throw new NotFoundException( __('Такой фотографии нет на сервере!') );
+        }
     }
 
     /**
@@ -177,37 +194,35 @@ class FilesController extends AppController
      */
     public function nextphoto()
     {
-        // Подключаемся к сессии.
         $session = $this->request->getSession();
-        if ( $session->check( 'currentphoto.fid' ) ) {
 
-            $fid_session = $session->read( 'currentphoto.fid' );
-            $session->write( 'currentphoto.fid', $fid_session + 1 );
+        if ( $session->check( 'bigphoto.total_page' ) and $session->check( 'bigphoto.current_page' ) ) {
+
+            $total_page = $session->read( 'bigphoto.total_page' );
+            $current_page = $session->read( 'bigphoto.current_page' );
+
+            $current_page--;
+            if ( $current_page === 0 ) {
+                $current_page = $total_page;
+            }
 
             $query = $this->Files
                 ->find()
                 ->where([
-                    'id >' => $fid_session,
                     'password_id' => 2,
                     'status' => 1,
-                ]);
-            $query_ = $query;
+                ])
+                ->order([ 'id' => 'ASC' ])
+                ->limit(1)
+                ->page( $current_page );
 
-            if ( $query_->count() == 0 ) {
-                $query = $this->Files
-                ->find()
-                ->where([
-                    'password_id' => 2,
-                    'status' => 1,
-                ]);
-            }
+            $session->write( 'bigphoto.current_page', $current_page );
 
-            $query = $query->first();
-            $session->write( 'currentphoto.fid', $query->id );
-
-            return $this->Streamphoto->send( $query->big_url );
+            return $this->Streamphoto->send( $query->first()->big_url );
         }
-        else throw new NotFoundException( __('Такой фотографии нет на сервере!') );
+        else {
+            throw new NotFoundException( __('Такой фотографии нет на сервере!') );
+        }
     }
 
     /**
@@ -215,40 +230,35 @@ class FilesController extends AppController
      */
     public function prevphoto()
     {
-        // Подключаемся к сессии.
         $session = $this->request->getSession();
-        if ( $session->check( 'currentphoto.fid' ) ) {
 
-            $fid_session = $session->read( 'currentphoto.fid' );
-            $session->write( 'currentphoto.fid', $fid_session - 1 );
+        if ( $session->check( 'bigphoto.total_page' ) and $session->check( 'bigphoto.current_page' ) ) {
+
+            $total_page = $session->read( 'bigphoto.total_page' );
+            $current_page = $session->read( 'bigphoto.current_page' );
+
+            $current_page++;
+            if ( $current_page > $total_page ) {
+                $current_page = 1;
+            }
 
             $query = $this->Files
                 ->find()
                 ->where([
-                    'id <' => $fid_session,
                     'password_id' => 2,
                     'status' => 1,
                 ])
-                ->order(['created' => 'ASC']);
+                ->order([ 'id' => 'ASC' ])
+                ->limit(1)
+                ->page( $current_page );
 
-            $query_ = $query;
+            $session->write( 'bigphoto.current_page', $current_page );
 
-            if ( $query_->count() == 0 ) {
-                $query = $this->Files
-                ->find()
-                ->where([
-                    'password_id' => 2,
-                    'status' => 1,
-                ])
-                ->order(['created' => 'ASC']);
-            }
-
-            $query = $query->first();
-            $session->write( 'currentphoto.fid', $query->id );
-
-            return $this->Streamphoto->send( $query->big_url );
+            return $this->Streamphoto->send( $query->first()->big_url );
         }
-        else throw new NotFoundException( __('Такой фотографии нет на сервере!') );
+        else {
+            throw new NotFoundException( __('Такой фотографии нет на сервере!') );
+        }
     }
 
     /**
