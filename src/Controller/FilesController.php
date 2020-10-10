@@ -145,7 +145,7 @@ class FilesController extends AppController
     }
 
     /**
-     * Возвращает текущую (по которой произощел щелчок) фотографию в виде потока.
+     * Возвращает текущую фотографию (по которой произощел щелчок) в виде потока.
      */
     public function currentphoto( $fid = null )
     {
@@ -169,20 +169,21 @@ class FilesController extends AppController
                 ->order([ 'id' => 'ASC' ])
                 ->count();
 
-            $query = $this->Files
-                ->find()
-                ->where([
-                    'id' => $fid,
-                    'password_id' => 2,
-                    'status' => 1,
-                ])
-                ->first();
-
             $session = $this->request->getSession();
             $session->write( 'bigphoto.total_page', $total_page );
             $session->write( 'bigphoto.current_page', $current_page );
 
-            return $this->Streamphoto->send( $query->big_url );
+            $files = $this->Files->get($fid, [
+                'contain' => ['Comments'],
+                'where' => [
+                    'Files.password_id' => 2,
+                    'Files.status' => 1,
+                ],
+            ]);
+
+            $session->write( 'bigphoto.comments', $files->comments );
+
+            return $this->Streamphoto->send( $files->big_url );
         }
         else {
             throw new NotFoundException( __('Такой фотографии нет на сервере!') );
@@ -273,8 +274,6 @@ class FilesController extends AppController
         $file = $this->Files->get($id, [
             'contain' => ['Passwords'],
         ]);
-
-        $this->set(compact('file'));
     }
 
     /**

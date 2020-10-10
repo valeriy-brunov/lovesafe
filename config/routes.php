@@ -9,9 +9,5 @@ $routes->plugin('Lovesafe', ['path' => '/'], function (RouteBuilder $routes) {
 
 // ../imgs/{url}
 $routes->plugin('Lovesafe', ['path' => '/'], function (RouteBuilder $routes) {
-    $routes->connect(
-    	'/img/{url}',
-    	['controller' => 'Files', 'action' => 'img'],
-    )
-    ->setPass(['url']);
+    $routes->connect( '/img/{url}', ['controller' => 'Files', 'action' => 'img'] )->setPass(['url']);
 });

@@ -41,7 +41,7 @@ provide(bemDom.declBlock(this.name,
 					channels( 'preview-big-photo' ).on( 'view', { mythis : this }, function( event, fid ) {
 						// Меняем адрес у тега "img".
 						event.data.mythis.setMod( 'display', 'loader' );
-						event.data.mythis._img.domElem.attr( 'src', window.location.pathname + '/currentphoto/' + fid );
+						event.data.mythis._img.domElem.attr( 'src', window.location.pathname + 'currentphoto/' + fid );
 						// Задаём параметры для отслеживания просмотра фотографий.
 						event.data.mythis._next = 0;
 						event.data.mythis._max_next = 0;
@@ -65,15 +65,13 @@ provide(bemDom.declBlock(this.name,
 							if ( this._max_next < this._next  ) {
 								this._max_next = this._next;
 							}
-							// Проверяем на граничное условие (пользователь просмотрел все фотографии).
-							if ( this._max_next == this.params.total_photos ) {
-								alert('Все фотографии просмотрены!');
-							}
-							//
+
+							// Проверка на граничные условия.
 							this._viewAllPhotos();
-							//
+
+							// Загружаем фотографию ввиде потока.
 							this.toggleMod( 'display', 'img', 'loader' );
-							this._img.domElem.attr( 'src', window.location.pathname + '/nextphoto/?_=' + Math.random() );
+							this._img.domElem.attr( 'src', window.location.pathname + 'nextphoto/?_=' + Math.random() );
 						});
 					}
 
@@ -88,32 +86,30 @@ provide(bemDom.declBlock(this.name,
 							if ( this._max_prev < this._prev  ) {
 								this._max_prev = this._prev;
 							}
-							// Проверяем на граничное условие (пользователь просмотрел все фотографии).
-							if ( this._max_prev == this.params.total_photos ) {
-								alert('Все фотографии просмотрены!');
-							}
-							//
+
+							// Проверка на граничные условия.
 							this._viewAllPhotos();
-							//
+
+							// Загружаем фотографию ввиде потока.
 							this.toggleMod( 'display', 'img', 'loader' );
-							this._img.domElem.attr( 'src', window.location.pathname + '/prevphoto/?_=' + Math.random() );
+							this._img.domElem.attr( 'src', window.location.pathname + 'prevphoto/?_=' + Math.random() );
 						});
 					}
-
-					// Фотография не загрузилась.
-					// this._domEvents( this._img ).on( 'error', function( event ) {
-					// 	alert();
-					// });
-
 				}
 			}
 		},
 
 		/**
-		 * 
+		 * Проверяет на граничное условие (пользователь просмотрел все фотографии).
 		 */
 		_viewAllPhotos: function() {
-			if ( (this._max_prev + this._max_next_) == this.params.total_photos ) {
+			if ( this._max_next == this.params.total_photos ) {
+				alert('Все фотографии просмотрены!');
+			}
+			if ( this._max_prev == this.params.total_photos ) {
+				alert('Все фотографии просмотрены!');
+			}
+			if ( (this._max_prev + this._max_next) == this.params.total_photos ) {
 				alert('Все фотографии просмотрены!');
 			}
 		},
