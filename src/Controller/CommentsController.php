@@ -14,6 +14,23 @@ use Lovesafe\Controller\AppController;
 class CommentsController extends AppController
 {
     /**
+     * Возвращает комментарии к фотографии большого формата. Комментарии должны быть загружены в сессию. Именно из сессии
+     * берутся комментарии и вставляются в шаблон.
+     */
+    public function currentcomments()
+    {
+        $session = $this->request->getSession();
+        $comments = $session->read( 'bigphoto.comments' );
+
+        // Основной шаблон.
+        $this->viewBuilder()->setLayout( 'ajax' );
+        // Вид.
+        // $this->render('ajax_imgs_start');
+
+        $this->set(compact('comments'));
+    }
+
+    /**
      * Index method
      *
      * @return \Cake\Http\Response|null|void Renders view

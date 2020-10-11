@@ -174,11 +174,13 @@ class FilesController extends AppController
             $session->write( 'bigphoto.current_page', $current_page );
 
             $files = $this->Files->get($fid, [
-                'contain' => ['Comments'],
-                'where' => [
-                    'Files.password_id' => 2,
-                    'Files.status' => 1,
-                ],
+                'Files.password_id' => 2,
+                'Files.status' => 1,
+                'contain' => ['Comments' => function($q) {
+                    return $q->contain('Passwords', function($q) {
+                        return $q->contain('Users');
+                    });
+                }],
             ]);
 
             $session->write( 'bigphoto.comments', $files->comments );
@@ -271,9 +273,33 @@ class FilesController extends AppController
      */
     public function view($id = null)
     {
-        $file = $this->Files->get($id, [
-            'contain' => ['Passwords'],
+        // $Passwords = $this->getTableLocator()->get('Passwords');
+        // $Passwords->find()->contain('Users');
+
+        $files = $this->Files
+            ->find()
+            ->where(['Files.id' => 576])
+            ->contain('Comments', function($q) {
+                return $q->contain('Passwords', function($q) {
+                    return $q->contain('Users');
+                });
+            })
+            ->toList();
+
+        $files2 = $this->Files->get(576, [
+            'contain' => ['Comments' => function($q) {
+                return $q->contain('Passwords', function($q) {
+                    return $q->contain('Users');
+                });
+            }]
         ]);
+
+        $this->viewBuilder()->setLayout( 'ajax' );
+
+    dump($files2->big_url);
+
+        
+
     }
 
     /**

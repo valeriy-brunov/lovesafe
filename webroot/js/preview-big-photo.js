@@ -41,7 +41,7 @@ provide(bemDom.declBlock(this.name,
 					channels( 'preview-big-photo' ).on( 'view', { mythis : this }, function( event, fid ) {
 						// Меняем адрес у тега "img".
 						event.data.mythis.setMod( 'display', 'loader' );
-						event.data.mythis._img.domElem.attr( 'src', window.location.pathname + 'currentphoto/' + fid );
+						event.data.mythis._img.domElem.attr( 'src', window.location.pathname + '/currentphoto/' + fid );
 						// Задаём параметры для отслеживания просмотра фотографий.
 						event.data.mythis._next = 0;
 						event.data.mythis._max_next = 0;
@@ -71,7 +71,7 @@ provide(bemDom.declBlock(this.name,
 
 							// Загружаем фотографию ввиде потока.
 							this.toggleMod( 'display', 'img', 'loader' );
-							this._img.domElem.attr( 'src', window.location.pathname + 'nextphoto/?_=' + Math.random() );
+							this._img.domElem.attr( 'src', window.location.pathname + '/nextphoto/?_=' + Math.random() );
 						});
 					}
 
@@ -92,7 +92,7 @@ provide(bemDom.declBlock(this.name,
 
 							// Загружаем фотографию ввиде потока.
 							this.toggleMod( 'display', 'img', 'loader' );
-							this._img.domElem.attr( 'src', window.location.pathname + 'prevphoto/?_=' + Math.random() );
+							this._img.domElem.attr( 'src', window.location.pathname + '/prevphoto/?_=' + Math.random() );
 						});
 					}
 				}
