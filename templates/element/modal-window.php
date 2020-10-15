@@ -14,13 +14,15 @@
  *		Класс ссылки закрытия.
  * @param {string} $content
  *		Содержимое модального окна.
+ * @param {string} $data_bem_modal_window
+ *		Дополнительные параметры к параметрам "modal-window". Например: 'data_bem_modal_window' => ' "height":"max","width":"max" ',
  * @param {json} $data_bem
  *		Добавляет атрибут "data-bem". Например: 'data_bem' => '{ "uploadfiles":{} }'
  */
 ?>
 
 <?php
-	$arr[] = '{"modal-window":{"name":"' . $name . '"}';
+	$arr[] = '{"modal-window":{"name":"' . $name . '"' . (isset($data_bem_modal_window) ? "," . $data_bem_modal_window : "") . '}';
 	if ( isset($data_bem) ) {
 		$arr[] = ',' . trim( substr( trim($data_bem), 1, -1 ) );
 	}
@@ -28,12 +30,10 @@
 	$data_bem = implode( '', $arr );
 ?>
 
-<div class="modal-window<?= isset($class_block) ? ' ' . $class_block : '' ?> i-bem" <?= isset($data_bem) ? ' data-bem=' . '\'' . $data_bem . '\'': '' ?>>
+<div class="modal-window modal-window_display_hide<?= isset($class_block) ? ' ' . $class_block : '' ?> i-bem" <?= isset($data_bem) ? ' data-bem=' . '\'' . $data_bem . '\'': '' ?>>
 	<div class="modal-window__wrap<?= isset($class_wrap) ? ' ' . $class_wrap : '' ?>">
-		<div class="modal-window__shell<?= isset($class_shell) ? ' ' . $class_shell : '' ?>">
-			<a class="modal-window__close<?= isset($class_close) ? ' ' . $class_close : '' ?>" href="#">Закрыть</a>
-			<?= isset($content) ? $content : '' ?>
-		</div>
+		<a class="modal-window__close<?= isset($class_close) ? ' ' . $class_close : '' ?>" href="#">Закрыть</a>
+		<?= isset($content) ? $content : '' ?>
 	</div>
 </div>
 

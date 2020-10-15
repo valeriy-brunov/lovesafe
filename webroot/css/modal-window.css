@@ -1,35 +1,24 @@
 .modal-window {
-  display: none;
   position: fixed;
-  z-index: 2020;
   top: 0;
-  right: 0;
   left: 0;
+  right: 0;
   bottom: 0;
+  padding: 20px 60px;
   background-color: rgba(50, 50, 50, 0.9);
+  overflow: auto;
 }
 
-.modal-window__wrap { padding: 10px; }
+.modal-window_display_hide { display: none; }
 
-.modal-window__shell {
+.modal-window_display_show { display: block; }
+
+.modal-window__wrap {
+  display: flex;
   background-color: #FFF;
-  z-index: 3000;
+  height: 100%;
 }
 
 .modal-window__close {}
 
-.modal-window_size_big {
-  display: block;
-  text-align: center;
-  overflow-y: scroll;
-}
-
-.modal-window_size_big .modal-window__wrap {
-  display: inline-block;
-}
-
-.modal-window_size_small {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+.modal-window__img {}
