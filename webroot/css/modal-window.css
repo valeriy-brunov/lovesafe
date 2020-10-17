@@ -14,11 +14,17 @@
 .modal-window_display_show { display: block; }
 
 .modal-window__wrap {
+  position: relative;
   display: flex;
   background-color: #FFF;
   height: 100%;
 }
 
-.modal-window__close {}
+.modal-window__close {
+  position: absolute;
+  right: -3em;
+  top: 0;
+  color: white;
+}
 
 .modal-window__img {}

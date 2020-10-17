@@ -10,8 +10,10 @@
  *		Класс обёртки модального окна.
  * @param {string} $class_shell
  *		Класс дополнительного шелла модального окна.
+ * @param {string} $close
+ * 		Объект, при нажатие на который модальное окно закрывается.
  * @param {string} $class_close
- *		Класс ссылки закрытия.
+ *		Дополнительный класс объекта закрытия.
  * @param {string} $content
  *		Содержимое модального окна.
  * @param {string} $data_bem_modal_window
@@ -32,7 +34,10 @@
 
 <div class="modal-window modal-window_display_hide<?= isset($class_block) ? ' ' . $class_block : '' ?> i-bem" <?= isset($data_bem) ? ' data-bem=' . '\'' . $data_bem . '\'': '' ?>>
 	<div class="modal-window__wrap<?= isset($class_wrap) ? ' ' . $class_wrap : '' ?>">
-		<a class="modal-window__close<?= isset($class_close) ? ' ' . $class_close : '' ?>" href="#">Закрыть</a>
+		<?php
+			if (isset($close)) echo '<div class="modal-window__close">' . $close . '</div>';
+			else echo '';
+		?>
 		<?= isset($content) ? $content : '' ?>
 	</div>
 </div>

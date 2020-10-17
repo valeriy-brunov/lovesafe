@@ -8,11 +8,16 @@
 <?php echo $this->element('Lovesafe.modal-window', [
 	'name' => 'big_photo',
 	'class_block' => 'preview-big-photo',
-	'content' => '
-		<div class="preview-big-photo__img" style="background-image: url()"></div>
-		<a href="#" class="preview-big-photo__nextphoto">следующее</a>
-		<a href="#" class="preview-big-photo__prevphoto">предыдущее</a>
-	' . $this->element('loader', ['add_class' => 'loader_theme_big-photo preview-big-photo__loader']),
+	'close' => '<i class="icons icon_close icons_size_large"></i>',
+	'content' =>
+		'<div class="preview-big-photo__img-wrap">' .
+			'<div class="preview-big-photo__img" style="background-image: url()"></div>' .
+			$this->element('loader', ['add_class' => 'loader_theme_big-photo preview-big-photo__loader']) .
+		'</div>' .
+		'<div class="preview-big-photo__navigation">' .
+			'<div class="preview-big-photo__prevphoto">1</div>' .
+			'<div class="preview-big-photo__nextphoto">2</div>' .
+		'</div>',
 	'data_bem' => '{ "preview-big-photo":{} }',
 ]) ?>
 

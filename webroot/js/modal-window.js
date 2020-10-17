@@ -30,7 +30,7 @@ provide(bemDom.declBlock(this.name,
 			        // Получаем объекты, с которыми будем работать.
 			        this._body = $( 'body' );
 			        this._wrap = this.findChildElem( 'wrap' );
-			        this._iconclose = this.findChildElem( 'close' );// Иконка закрытия.
+			        this._close = this.findChildElem( 'close' );// Иконка закрытия.
 
 		            // События.
 		            // Следующие два события происходят одновременно, если курсор находится в пределах модального окна.
@@ -53,12 +53,22 @@ provide(bemDom.declBlock(this.name,
 			            }
 		            });
 
+		            // Щелчок на иконку закрытия модального окна.
+					this._domEvents( this._close ).on( 'click', function( event ) {
+						this.close();
+					});
+
 		            // Именованный канал события на открытия модального окна.
 			        channels( 'modal-window' ).on( 'openmodal', { mythis: this }, function( event, data ) {
 			            // Открыть модальное окно возможно только в текущем экземпляре.
 			            if ( event.data.mythis.params.name == data ) {
 			            	event.data.mythis.open( data );
 			            }
+			        });
+
+			        // Именованный канал события на закрытия модального окна.
+			        channels( 'modal-window' ).on( 'closemodal', { mythis: this }, function( event ) {
+			          	event.data.mythis.close();
 			        });
 
 				}

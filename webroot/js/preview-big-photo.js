@@ -35,26 +35,19 @@ provide(bemDom.declBlock(this.name,
 					this._img = this.findChildElem( 'img' );
 					this._nextphoto = this.findChildElem( 'nextphoto' );
 					this._prevphoto = this.findChildElem( 'prevphoto' );
+					this._close = this.findChildElem( 'close' );
 
 					// События.
 					// Пользователь произвёл щелчок по превью фотографии.
 					channels( 'preview-big-photo' ).on( 'view', { mythis : this }, function( event, fid ) {
 						// Меняем адрес у тега "img".
-						event.data.mythis.setMod( 'display', 'loader' );
-						//event.data.mythis._img.domElem.attr( 'src', window.location.pathname + '/currentphoto/' + fid );
-						//event.data.mythis._img.domElem.attr( 'style', 'background-image: url(' + window.location.pathname + '/currentphoto/' + fid + ')' );
-						event.data.mythis._imgLoad( window.location.pathname + '/currentphoto/' + fid );
+						event.data.mythis._img.domElem.attr( 'style', 'background-image: url(' + window.location.pathname + '/currentphoto/' + fid + ')' );
 						// Задаём параметры для отслеживания просмотра фотографий.
 						event.data.mythis._next = 0;
 						event.data.mythis._max_next = 0;
 						event.data.mythis._prev = 0;
 						event.data.mythis._max_prev = 0;
 					});
-
-					// Фотография загружена.
-					//this._domEvents( this._img ).on( 'load', function( event ) {
-						//this.setMod( 'display', 'img' );
-					//});
 
 					// Пользователь произвёл щелчок на объекте "следующее фото".
 					if ( this._nextphoto ) {
@@ -72,10 +65,8 @@ provide(bemDom.declBlock(this.name,
 							this._viewAllPhotos();
 
 							// Загружаем фотографию ввиде потока.
-							this.toggleMod( 'display', 'img', 'loader' );
-							//this._img.domElem.attr( 'src', window.location.pathname + '/nextphoto/?_=' + Math.random() );
-							//this._img.domElem.attr( 'style', 'background-image: url(' + window.location.pathname + '/nextphoto/?_=' + Math.random() + ')' );
-							this._imgLoad( window.location.pathname + '/nextphoto/?_=' + Math.random() );
+							this._img.domElem.attr( 'style', 'background-image: url()' );
+							this._img.domElem.attr( 'style', 'background-image: url(' + window.location.pathname + '/nextphoto/?_=' + Math.random() + ')' );
 						});
 					}
 
@@ -95,12 +86,11 @@ provide(bemDom.declBlock(this.name,
 							this._viewAllPhotos();
 
 							// Загружаем фотографию ввиде потока.
-							this.toggleMod( 'display', 'img', 'loader' );
-							//this._img.domElem.attr( 'src', window.location.pathname + '/prevphoto/?_=' + Math.random() );
-							//this._img.domElem.attr( 'style', 'background-image: url(' + window.location.pathname + '/prevphoto/?_=' + Math.random() + ')' );
-							this._imgLoad( window.location.pathname + '/prevphoto/?_=' + Math.random() );
+							this._img.domElem.attr( 'style', 'background-image: url()' );
+							this._img.domElem.attr( 'style', 'background-image: url(' + window.location.pathname + '/prevphoto/?_=' + Math.random() + ')' );
 						});
 					}
+
 				}
 			}
 		},
@@ -118,20 +108,6 @@ provide(bemDom.declBlock(this.name,
 			if ( (this._max_prev + this._max_next) == this.params.total_photos ) {
 				alert('Все фотографии просмотрены!');
 			}
-		},
-		
-		/**
-		 * 
-		 */
-		_imgLoad: function( url ) {
-			var _url = url;
-			var mythis = this;
-			let img = document.createElement( "img" );
-			img.src = url;
-			img.onload = function() {
-				mythis._img.domElem.attr( 'style', 'background-image: url(' + _url + ')' );
-				mythis.setMod( 'display', 'img' );
-			};
 		},
 
 	},
